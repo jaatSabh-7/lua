@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lua Mastery — Zero to Pro in 2 Days</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap');
+
+  :root {
+    --bg: #0d0f0e;
+    --surface: #131614;
+    --card: #181c1a;
+    --border: #252b28;
+    --accent: #7fff6e;
+    --accent2: #3df5c1;
+    --accent3: #f5c23d;
+    --muted: #4a5450;
+    --text: #d4dbd8;
+    --code-bg: #0a0c0b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── HEADER ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg);
+  }
+  .logo { font-weight: 800; font-size: 1.1rem; color: var(--accent); letter-spacing: -0.5px; }
+  .logo span { color: var(--text); }
+  .progress-bar-wrap { flex: 1; max-width: 300px; margin: 0 24px; height: 4px; background: var(--border); border-radius: 2px; }
+  .progress-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width .4s; width: 0%; }
+  #progress-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* ── LAYOUT ── */
+  .wrapper { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  nav {
+    width: 260px; min-width: 260px;
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky; top: 57px;
+    height: calc(100vh - 57px);
+    overflow-y: auto;
+  }
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .day-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    padding: 16px 20px 6px;
+  }
+  nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 20px;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+  nav a:hover { color: var(--text); background: var(--surface); }
+  nav a.active { color: var(--accent); border-left-color: var(--accent); background: var(--surface); }
+  nav a .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 18px;
+  }
+  nav a.done .num { color: var(--accent); }
+  nav a.done .num::after { content: '✓'; }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 860px;
+  }
+
+  .section { display: none; animation: fadeIn .3s ease; }
+  .section.active { display: block; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* ── SECTION HEADER ── */
+  .sec-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 8px;
+  }
+  h1 { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 12px; }
+  h2 { font-size: 1.3rem; font-weight: 700; color: #fff; margin: 32px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 1rem; font-weight: 700; color: var(--accent3); margin: 22px 0 8px; }
+  p { margin-bottom: 12px; color: var(--text); }
+  ul, ol { margin: 0 0 12px 20px; }
+  li { margin-bottom: 4px; }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 14px 0;
+    position: relative;
+  }
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #c9d1d9;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--accent2);
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+
+  /* syntax highlight helpers */
+  .kw { color: #ff7b72; }
+  .str { color: #a5d6ff; }
+  .cmt { color: #6a737d; font-style: italic; }
+  .num { color: #79c0ff; }
+  .fn { color: #d2a8ff; }
+  .op { color: #ff7b72; }
+  .var { color: var(--accent); }
+  .builtin { color: var(--accent3); }
+
+  /* ── CALLOUTS ── */
+  .tip, .warn, .info {
+    border-left: 3px solid;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 13.5px;
+  }
+  .tip { border-color: var(--accent); background: #7fff6e0d; }
+  .warn { border-color: var(--accent3); background: #f5c23d0d; }
+  .info { border-color: var(--accent2); background: #3df5c10d; }
+  .tip::before { content: '💡 '; }
+  .warn::before { content: '⚠️ '; }
+  .info::before { content: 'ℹ️ '; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { background: var(--surface); color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: var(--surface); }
+
+  /* ── NAV BUTTONS ── */
+  .nav-btns { display: flex; gap: 12px; margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .btn {
+    padding: 10px 22px;
+    border-radius: 4px;
+    border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 13px;
+    transition: all .15s;
+  }
+  .btn-primary { background: var(--accent); color: #0d0f0e; }
+  .btn-primary:hover { background: #9fff90; }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── QUIZ ── */
+  .quiz { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 24px 0; }
+  .quiz h4 { color: var(--accent2); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; }
+  .quiz-q { font-weight: 700; margin-bottom: 12px; }
+  .quiz-opts label { display: block; padding: 8px 12px; margin: 6px 0; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; transition: border-color .15s; font-size: 13px; }
+  .quiz-opts label:hover { border-color: var(--accent); }
+  .quiz-opts input { margin-right: 8px; }
+  .quiz-result { margin-top: 10px; font-size: 13px; display: none; }
+  .quiz-result.correct { color: var(--accent); }
+  .quiz-result.wrong { color: #f77; }
+  .check-btn { margin-top: 12px; }
+
+  /* ── TAGS ── */
+  .tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 12px; border: 1px solid; margin: 0 3px 4px 0; }
+  .tag-day1 { border-color: var(--accent); color: var(--accent); }
+  .tag-day2 { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── HERO ── */
+  .hero-intro { margin-bottom: 32px; }
+  .hero-intro p { font-size: 1rem; color: var(--muted); }
+  .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+  .plan-card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 16px; }
+  .plan-card h3 { margin-top: 0; }
+  .plan-card ul { font-size: 13px; color: var(--muted); }
+  .plan-card ul li { margin-bottom: 3px; }
+
+  @media (max-width: 768px) {
+    nav { display: none; }
+    main { padding: 24px 20px; }
+    .plan-grid { grid-template-columns: 1fr; }
+    .progress-bar-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">lua<span>.guide</span></div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="pbar"></div></div>
+  <span id="progress-label">0 / 20</span>
+</header>
+
+<div class="wrapper">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="day-label">Start Here</div>
+  <a href="#" onclick="go(0)" class="nav-link active"><span class="num">00</span>Introduction & Plan</a>
+
+  <div class="day-label">Day 1 — Foundations</div>
+  <a href="#" onclick="go(1)" class="nav-link"><span class="num">01</span>Setup & First Script</a>
+  <a href="#" onclick="go(2)" class="nav-link"><span class="num">02</span>Variables & Types</a>
+  <a href="#" onclick="go(3)" class="nav-link"><span class="num">03</span>Operators</a>
+  <a href="#" onclick="go(4)" class="nav-link"><span class="num">04</span>Control Flow</a>
+  <a href="#" onclick="go(5)" class="nav-link"><span class="num">05</span>Loops</a>
+  <a href="#" onclick="go(6)" class="nav-link"><span class="num">06</span>Functions</a>
+  <a href="#" onclick="go(7)" class="nav-link"><span class="num">07</span>Tables (Arrays)</a>
+  <a href="#" onclick="go(8)" class="nav-link"><span class="num">08</span>Tables (Dicts & Nesting)</a>
+  <a href="#" onclick="go(9)" class="nav-link"><span class="num">09</span>Strings Deep Dive</a>
+  <a href="#" onclick="go(10)" class="nav-link"><span class="num">10</span>Day 1 Project</a>
+
+  <div class="day-label">Day 2 — Professional</div>
+  <a href="#" onclick="go(11)" class="nav-link"><span class="num">11</span>Scope & Closures</a>
+  <a href="#" onclick="go(12)" class="nav-link"><span class="num">12</span>Metatables & OOP</a>
+  <a href="#" onclick="go(13)" class="nav-link"><span class="num">13</span>Inheritance & Mixins</a>
+  <a href="#" onclick="go(14)" class="nav-link"><span class="num">14</span>Error Handling</a>
+  <a href="#" onclick="go(15)" class="nav-link"><span class="num">15</span>Modules & Packages</a>
+  <a href="#" onclick="go(16)" class="nav-link"><span class="num">16</span>Coroutines</a>
+  <a href="#" onclick="go(17)" class="nav-link"><span class="num">17</span>File I/O & os/io libs</a>
+  <a href="#" onclick="go(18)" class="nav-link"><span class="num">18</span>Patterns & Performance</a>
+  <a href="#" onclick="go(19)" class="nav-link"><span class="num">19</span>Day 2 Project + Next Steps</a>
+</nav>
+
+<!-- CONTENT -->
+<main>
+
+<!-- 00 INTRO -->
+<div class="section active" id="s0">
+  <div class="sec-badge">Welcome</div>
+  <h1>Lua — Zero to Professional<br>in 2 Days</h1>
+  <div class="hero-intro">
+    <p>A complete, dense course covering every concept you need to write professional Lua. No fluff — just everything, in order.</p>
+  </div>
+  <div class="plan-grid">
+    <div class="plan-card">
+      <h3><span class="tag tag-day1">Day 1</span> Foundations (~6–8 hrs)</h3>
+      <ul>
+        <li>Setup & running scripts</li>
+        <li>Variables, types, operators</li>
+        <li>Control flow & loops</li>
+        <li>Functions (all forms)</li>
+        <li>Tables as arrays & dicts</li>
+        <li>String manipulation</li>
+        <li>Mini project: text adventure</li>
+      </ul>
+    </div>
+    <div class="plan-card">
+      <h3><span class="tag tag-day2">Day 2</span> Professional (~6–8 hrs)</h3>
+      <ul>
+        <li>Scope, closures, upvalues</li>
+        <li>Metatables & OOP</li>
+        <li>Inheritance & mixins</li>
+        <li>Error handling</li>
+        <li>Modules & require</li>
+        <li>Coroutines</li>
+        <li>File I/O, patterns, perf tips</li>
+        <li>Final project: task manager</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tip">Each section ends with a quiz. Pass every quiz and you're genuinely ready to build real things in Lua.</div>
+  <div class="info">Lua is used in game dev (Roblox, LÖVE2D, Corona), embedded systems, Nginx/OpenResty, Redis scripting, Neovim config, and more. It's tiny (≈280KB) yet extremely powerful.</div>
+  <div class="nav-btns"><button class="btn btn-primary" onclick="go(1)">Start Day 1 →</button></div>
+</div>
+
+<!-- 01 SETUP -->
+<div class="section" id="s1">
+  <div class="sec-badge">Day 1 · Section 01</div>
+  <h1>Setup & Your First Script</h1>
+  <h2>Installing Lua</h2>
+  <table>
+    <tr><th>OS</th><th>Command</th></tr>
+    <tr><td>Ubuntu/Debian</td><td><code>sudo apt install lua5.4</code></td></tr>
+    <tr><td>macOS</td><td><code>brew install lua</code></td></tr>
+    <tr><td>Windows</td><td>Download from <strong>lua.org/download</strong> or use <code>choco install lua</code></td></tr>
+    <tr><td>Online</td><td><strong>replit.com</strong> or <strong>onecompiler.com/lua</strong></td></tr>
+  </table>
+  <h2>Running Scripts</h2>
+  <pre><code><span class="cmt">-- Save as hello.lua, run: lua hello.lua</span>
+<span class="fn">print</span>(<span class="str">"Hello, Lua!"</span>)           <span class="cmt">-- prints to stdout + newline</span>
+<span class="fn">io.write</span>(<span class="str">"no newline here"</span>)    <span class="cmt">-- write without newline</span></code></pre>
+  <h2>Interactive REPL</h2>
+  <p>Just type <code>lua</code> in your terminal to open the interactive prompt. Great for quick experiments.</p>
+  <h2>Comments</h2>
+  <pre><code><span class="cmt">-- Single line comment</span>
+
+<span class="cmt">--[[
+  Multi-line comment.
+  Everything here is ignored.
+--]]</span></code></pre>
+  <h2>Semicolons</h2>
+  <p>Semicolons are optional in Lua. Newlines work as statement separators. You'll almost never need them.</p>
+  <div class="tip">The Lua REPL evaluates expressions and prints their value automatically — great for learning.</div>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What function prints a line to stdout in Lua?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q1" value="a"> console.log()</label>
+      <label><input type="radio" name="q1" value="b"> print()</label>
+      <label><input type="radio" name="q1" value="c"> echo()</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q1','b',this)">Check</button>
+    <div class="quiz-result" id="q1-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(0)">← Back</button>
+    <button class="btn btn-primary" onclick="go(2)">Next →</button>
+  </div>
+</div>
+
+<!-- 02 VARIABLES & TYPES -->
+<div class="section" id="s2">
+  <div class="sec-badge">Day 1 · Section 02</div>
+  <h1>Variables & Types</h1>
+  <h2>Eight Basic Types</h2>
+  <table>
+    <tr><th>Type</th><th>Example</th><th>Notes</th></tr>
+    <tr><td>nil</td><td><code>nil</code></td><td>Absence of value; unassigned vars are nil</td></tr>
+    <tr><td>boolean</td><td><code>true</code>, <code>false</code></td><td>Only <code>false</code> and <code>nil</code> are falsy — 0 is truthy!</td></tr>
+    <tr><td>number</td><td><code>42</code>, <code>3.14</code>, <code>1e10</code></td><td>Lua 5.3+ has integer & float subtypes</td></tr>
+    <tr><td>string</td><td><code>"hi"</code>, <code>'hi'</code></td><td>Immutable, 8-bit clean</td></tr>
+    <tr><td>table</td><td><code>{}</code></td><td>The only data structure; arrays, dicts, objects</td></tr>
+    <tr><td>function</td><td><code>function() end</code></td><td>First-class values</td></tr>
+    <tr><td>userdata</td><td>C objects</td><td>Used when embedding Lua in C/C++</td></tr>
+    <tr><td>thread</td><td>coroutines</td><td>Covered in Day 2</td></tr>
+  </table>
+  <h2>Declaring Variables</h2>
+  <pre><code><span class="cmt">-- Global variable (avoid in large programs)</span>
+<span class="var">x</span> = <span class="num">10</span>
+
+<span class="cmt">-- Local variable (prefer always)</span>
+<span class="kw">local</span> <span class="var">name</span> = <span class="str">"Ada"</span>
+<span class="kw">local</span> <span class="var">age</span>  = <span class="num">30</span>
+<span class="kw">local</span> <span class="var">pi</span>   = <span class="num">3.14159</span>
+<span class="kw">local</span> <span class="var">flag</span> = <span class="kw">true</span>
+<span class="kw">local</span> <span class="var">nothing</span> = <span class="kw">nil</span>
+
+<span class="cmt">-- Multiple assignment</span>
+<span class="kw">local</span> <span class="var">a</span>, <span class="var">b</span>, <span class="var">c</span> = <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>
+
+<span class="cmt">-- Swap without temp!</span>
+<span class="var">a</span>, <span class="var">b</span> = <span class="var">b</span>, <span class="var">a</span>
+
+<span class="cmt">-- type() returns the type name as a string</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="var">name</span>))   <span class="cmt">-- "string"</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="num">42</span>))     <span class="cmt">-- "number"</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="kw">nil</span>))    <span class="cmt">-- "nil"</span>
+<span class="fn">print</span>(<span class="fn">type</span>({}))    <span class="cmt">-- "table"</span></code></pre>
+  <h2>String Literals</h2>
+  <pre><code><span class="kw">local</span> <span class="var">s1</span> = <span class="str">"double quotes"</span>
+<span class="kw">local</span> <span class="var">s2</span> = <span class="str">'single quotes'</span>
+<span class="kw">local</span> <span class="var">s3</span> = <span class="str">[[
+  long string — spans
+  multiple lines, no escapes needed
+]]</span>
+
+<span class="cmt">-- String concatenation uses ..</span>
+<span class="fn">print</span>(<span class="str">"Hello, "</span> <span class="op">..</span> <span class="var">name</span> <span class="op">..</span> <span class="str">"!"</span>)
+
+<span class="cmt">-- # gives string length</span>
+<span class="fn">print</span>(<span class="op">#</span><span class="var">name</span>)   <span class="cmt">-- 3 (for "Ada")</span></code></pre>
+  <div class="warn">In Lua, <code>0</code> is <strong>truthy</strong>. Only <code>false</code> and <code>nil</code> are falsy. This trips up everyone coming from C or JavaScript.</div>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What is the value of <code>type(nil)</code> in Lua?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q2" value="a"> "undefined"</label>
+      <label><input type="radio" name="q2" value="b"> "null"</label>
+      <label><input type="radio" name="q2" value="c"> "nil"</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q2','c',this)">Check</button>
+    <div class="quiz-result" id="q2-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(1)">← Back</button>
+    <button class="btn btn-primary" onclick="go(3)">Next →</button>
+  </div>
+</div>
+
+<!-- 03 OPERATORS -->
+<div class="section" id="s3">
+  <div class="sec-badge">Day 1 · Section 03</div>
+  <h1>Operators</h1>
+  <h2>Arithmetic</h2>
+  <pre><code><span class="fn">print</span>(<span class="num">10</span> <span class="op">+</span> <span class="num">3</span>)    <span class="cmt">-- 13</span>
+<span class="fn">print</span>(<span class="num">10</span> <span class="op">-</span> <span class="num">3</span>)    <span class="cmt">-- 7</span>
+<span class="fn">print</span>(<span class="num">10</span> <span class="op">*</span> <span class="num">3</span>)    <span class="cmt">-- 30</span>
+<span class="fn">print</span>(<span class="num">10</span> <span class="op">/</span> <span class="num">3</span>)    <span class="cmt">-- 3.3333... (always float in Lua 5.3+)</span>
+<span class="fn">print</span>(<span class="num">10</span> <span class="op">//</span> <span class="num">3</span>)   <span class="cmt">-- 3   (floor division)</span>
+<span class="fn">print</span>(<span class="num">10</span> <span class="op">%</span> <span class="num">3</span>)    <span class="cmt">-- 1   (modulo)</span>
+<span class="fn">print</span>(<span class="num">2</span> <span class="op">^</span> <span class="num">10</span>)    <span class="cmt">-- 1024.0 (exponentiation, always float)</span>
+<span class="fn">print</span>(<span class="op">-</span><span class="num">5</span>)        <span class="cmt">-- -5 (unary minus)</span></code></pre>
+  <h2>Comparison</h2>
+  <pre><code><span class="fn">print</span>(<span class="num">1</span> <span class="op">==</span> <span class="num">1</span>)    <span class="cmt">-- true</span>
+<span class="fn">print</span>(<span class="num">1</span> <span class="op">~=</span> <span class="num">2</span>)    <span class="cmt">-- true  (~= is "not equal", not !=)</span>
+<span class="fn">print</span>(<span class="num">5</span> <span class="op">></span> <span class="num">3</span>)     <span class="cmt">-- true</span>
+<span class="fn">print</span>(<span class="num">5</span> <span class="op">>=</span> <span class="num">5</span>)    <span class="cmt">-- true</span>
+<span class="fn">print</span>(<span class="str">"abc"</span> <span class="op">==</span> <span class="str">"abc"</span>)  <span class="cmt">-- true (strings compared by value)</span></code></pre>
+  <h2>Logical</h2>
+  <pre><code><span class="fn">print</span>(<span class="kw">true</span> <span class="kw">and</span> <span class="kw">false</span>)   <span class="cmt">-- false</span>
+<span class="fn">print</span>(<span class="kw">true</span> <span class="kw">or</span> <span class="kw">false</span>)    <span class="cmt">-- true</span>
+<span class="fn">print</span>(<span class="kw">not</span> <span class="kw">true</span>)          <span class="cmt">-- false</span>
+
+<span class="cmt">-- and/or return one of their operands (not just true/false!)</span>
+<span class="fn">print</span>(<span class="num">1</span> <span class="kw">and</span> <span class="num">2</span>)    <span class="cmt">-- 2   (returns last truthy, or first falsy)</span>
+<span class="fn">print</span>(<span class="kw">nil</span> <span class="kw">and</span> <span class="num">2</span>)  <span class="cmt">-- nil</span>
+<span class="fn">print</span>(<span class="kw">false</span> <span class="kw">or</span> <span class="str">"default"</span>)  <span class="cmt">-- "default" (ternary pattern!)</span>
+
+<span class="cmt">-- Common idiom: default value</span>
+<span class="kw">local</span> <span class="var">val</span> = <span class="var">input</span> <span class="kw">or</span> <span class="str">"fallback"</span></code></pre>
+  <h2>String & Length</h2>
+  <pre><code><span class="fn">print</span>(<span class="str">"Hello"</span> <span class="op">..</span> <span class="str">" World"</span>)   <span class="cmt">-- "Hello World"</span>
+<span class="fn">print</span>(<span class="op">#</span><span class="str">"Hello"</span>)              <span class="cmt">-- 5</span>
+<span class="fn">print</span>(<span class="op">#</span>{<span class="num">10</span>,<span class="num">20</span>,<span class="num">30</span>})          <span class="cmt">-- 3 (table length)</span></code></pre>
+  <div class="tip">The <code>or</code> idiom for defaults (<code>x = value or "default"</code>) is everywhere in Lua code. Learn it well.</div>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What does <code>print(false or "hello")</code> output?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q3" value="a"> false</label>
+      <label><input type="radio" name="q3" value="b"> hello</label>
+      <label><input type="radio" name="q3" value="c"> nil</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q3','b',this)">Check</button>
+    <div class="quiz-result" id="q3-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(2)">← Back</button>
+    <button class="btn btn-primary" onclick="go(4)">Next →</button>
+  </div>
+</div>
+
+<!-- 04 CONTROL FLOW -->
+<div class="section" id="s4">
+  <div class="sec-badge">Day 1 · Section 04</div>
+  <h1>Control Flow</h1>
+  <h2>if / elseif / else</h2>
+  <pre><code><span class="kw">local</span> <span class="var">score</span> = <span class="num">85</span>
+
+<span class="kw">if</span> <span class="var">score</span> <span class="op">>=</span> <span class="num">90</span> <span class="kw">then</span>
+    <span class="fn">print</span>(<span class="str">"A"</span>)
+<span class="kw">elseif</span> <span class="var">score</span> <span class="op">>=</span> <span class="num">80</span> <span class="kw">then</span>
+    <span class="fn">print</span>(<span class="str">"B"</span>)
+<span class="kw">elseif</span> <span class="var">score</span> <span class="op">>=</span> <span class="num">70</span> <span class="kw">then</span>
+    <span class="fn">print</span>(<span class="str">"C"</span>)
+<span class="kw">else</span>
+    <span class="fn">print</span>(<span class="str">"F"</span>)
+<span class="kw">end</span></code></pre>
+  <div class="warn">No <code>switch/case</code> in Lua. Use <code>if/elseif</code> chains or a dispatch table (covered in tables section).</div>
+  <h2>Ternary Pattern</h2>
+  <pre><code><span class="cmt">-- Lua has no ternary operator, but this idiom works:</span>
+<span class="kw">local</span> <span class="var">label</span> = (<span class="var">score</span> <span class="op">>=</span> <span class="num">60</span>) <span class="kw">and</span> <span class="str">"pass"</span> <span class="kw">or</span> <span class="str">"fail"</span>
+
+<span class="cmt">-- Gotcha: if "pass" could be false/nil, use a function instead</span></code></pre>
+  <h2>Checking for nil</h2>
+  <pre><code><span class="kw">local</span> <span class="var">user</span> = <span class="kw">nil</span>
+
+<span class="kw">if</span> <span class="var">user</span> <span class="op">~=</span> <span class="kw">nil</span> <span class="kw">then</span>
+    <span class="fn">print</span>(<span class="var">user</span>)
+<span class="kw">end</span>
+
+<span class="cmt">-- Shorter (nil is falsy):</span>
+<span class="kw">if</span> <span class="var">user</span> <span class="kw">then</span>
+    <span class="fn">print</span>(<span class="var">user</span>)
+<span class="kw">end</span></code></pre>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">Does Lua have a built-in <code>switch</code> statement?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q4" value="a"> Yes, it's called switch/case</label>
+      <label><input type="radio" name="q4" value="b"> No — use if/elseif or dispatch tables</label>
+      <label><input type="radio" name="q4" value="c"> Yes, it's called match</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q4','b',this)">Check</button>
+    <div class="quiz-result" id="q4-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(3)">← Back</button>
+    <button class="btn btn-primary" onclick="go(5)">Next →</button>
+  </div>
+</div>
+
+<!-- 05 LOOPS -->
+<div class="section" id="s5">
+  <div class="sec-badge">Day 1 · Section 05</div>
+  <h1>Loops</h1>
+  <h2>while</h2>
+  <pre><code><span class="kw">local</span> <span class="var">i</span> = <span class="num">1</span>
+<span class="kw">while</span> <span class="var">i</span> <span class="op"><=</span> <span class="num">5</span> <span class="kw">do</span>
+    <span class="fn">print</span>(<span class="var">i</span>)
+    <span class="var">i</span> = <span class="var">i</span> <span class="op">+</span> <span class="num">1</span>    <span class="cmt">-- no ++ or += in Lua</span>
+<span class="kw">end</span></code></pre>
+  <h2>repeat / until</h2>
+  <pre><code><span class="kw">local</span> <span class="var">n</span> = <span class="num">0</span>
+<span class="kw">repeat</span>
+    <span class="var">n</span> = <span class="var">n</span> <span class="op">+</span> <span class="num">1</span>
+<span class="kw">until</span> <span class="var">n</span> <span class="op">>=</span> <span class="num">5</span>   <span class="cmt">-- condition checked AFTER body (like do-while)</span>
+<span class="fn">print</span>(<span class="var">n</span>)  <span class="cmt">-- 5</span></code></pre>
+  <h2>Numeric for</h2>
+  <pre><code><span class="cmt">-- for var = start, limit, step do</span>
+<span class="kw">for</span> <span class="var">i</span> = <span class="num">1</span>, <span class="num">10</span> <span class="kw">do</span>
+    <span class="fn">io.write</span>(<span class="var">i</span> <span class="op">..</span> <span class="str">" "</span>)
+<span class="kw">end</span>
+<span class="cmt">-- output: 1 2 3 4 5 6 7 8 9 10</span>
+
+<span class="cmt">-- Countdown with step -1</span>
+<span class="kw">for</span> <span class="var">i</span> = <span class="num">10</span>, <span class="num">1</span>, <span class="op">-</span><span class="num">1</span> <span class="kw">do</span>
+    <span class="fn">io.write</span>(<span class="var">i</span> <span class="op">..</span> <span class="str">" "</span>)
+<span class="kw">end</span>
+
+<span class="cmt">-- Even numbers</span>
+<span class="kw">for</span> <span class="var">i</span> = <span class="num">2</span>, <span class="num">20</span>, <span class="num">2</span> <span class="kw">do</span>
+    <span class="fn">io.write</span>(<span class="var">i</span> <span class="op">..</span> <span class="str">" "</span>)
+<span class="kw">end</span></code></pre>
+  <h2>Generic for (iterators)</h2>
+  <pre><code><span class="kw">local</span> <span class="var">fruits</span> = {<span class="str">"apple"</span>, <span class="str">"banana"</span>, <span class="str">"cherry"</span>}
+
+<span class="cmt">-- ipairs: index-value pairs (sequential tables)</span>
+<span class="kw">for</span> <span class="var">i</span>, <span class="var">v</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">fruits</span>) <span class="kw">do</span>
+    <span class="fn">print</span>(<span class="var">i</span>, <span class="var">v</span>)
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">config</span> = { host = <span class="str">"localhost"</span>, port = <span class="num">8080</span> }
+
+<span class="cmt">-- pairs: all key-value pairs (any order)</span>
+<span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="fn">pairs</span>(<span class="var">config</span>) <span class="kw">do</span>
+    <span class="fn">print</span>(<span class="var">k</span>, <span class="var">v</span>)
+<span class="kw">end</span></code></pre>
+  <h2>break & goto</h2>
+  <pre><code><span class="kw">for</span> <span class="var">i</span> = <span class="num">1</span>, <span class="num">100</span> <span class="kw">do</span>
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">==</span> <span class="num">5</span> <span class="kw">then</span> <span class="kw">break</span> <span class="kw">end</span>
+    <span class="fn">print</span>(<span class="var">i</span>)
+<span class="kw">end</span>
+
+<span class="cmt">-- goto (Lua 5.2+): use sparingly for continue-like behaviour</span>
+<span class="kw">for</span> <span class="var">i</span> = <span class="num">1</span>, <span class="num">10</span> <span class="kw">do</span>
+    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> <span class="num">2</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span> <span class="kw">goto</span> continue <span class="kw">end</span>
+    <span class="fn">print</span>(<span class="var">i</span>)          <span class="cmt">-- prints odd numbers</span>
+    <span class="op">::</span>continue<span class="op">::</span>
+<span class="kw">end</span></code></pre>
+  <div class="tip">Lua has no <code>continue</code> keyword. Use <code>goto continue</code> with a label, or restructure with <code>if not ... then</code>.</div>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">Which iterator preserves array order in Lua?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q5" value="a"> pairs()</label>
+      <label><input type="radio" name="q5" value="b"> ipairs()</label>
+      <label><input type="radio" name="q5" value="c"> each()</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q5','b',this)">Check</button>
+    <div class="quiz-result" id="q5-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(4)">← Back</button>
+    <button class="btn btn-primary" onclick="go(6)">Next →</button>
+  </div>
+</div>
+
+<!-- 06 FUNCTIONS -->
+<div class="section" id="s6">
+  <div class="sec-badge">Day 1 · Section 06</div>
+  <h1>Functions</h1>
+  <h2>Basic Syntax</h2>
+  <pre><code><span class="cmt">-- Declaration form</span>
+<span class="kw">function</span> <span class="fn">greet</span>(<span class="var">name</span>)
+    <span class="kw">return</span> <span class="str">"Hello, "</span> <span class="op">..</span> <span class="var">name</span>
+<span class="kw">end</span>
+
+<span class="cmt">-- Expression form (prefer local!)</span>
+<span class="kw">local</span> <span class="fn">square</span> = <span class="kw">function</span>(<span class="var">n</span>) <span class="kw">return</span> <span class="var">n</span> <span class="op">*</span> <span class="var">n</span> <span class="kw">end</span>
+
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="str">"Lua"</span>))   <span class="cmt">-- Hello, Lua</span>
+<span class="fn">print</span>(<span class="fn">square</span>(<span class="num">9</span>))     <span class="cmt">-- 81</span></code></pre>
+  <h2>Multiple Return Values</h2>
+  <pre><code><span class="kw">function</span> <span class="fn">minmax</span>(<span class="var">t</span>)
+    <span class="kw">local</span> <span class="var">mn</span>, <span class="var">mx</span> = <span class="var">t</span>[<span class="num">1</span>], <span class="var">t</span>[<span class="num">1</span>]
+    <span class="kw">for</span> <span class="var">_</span>, <span class="var">v</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">t</span>) <span class="kw">do</span>
+        <span class="kw">if</span> <span class="var">v</span> <span class="op"><</span> <span class="var">mn</span> <span class="kw">then</span> <span class="var">mn</span> = <span class="var">v</span> <span class="kw">end</span>
+        <span class="kw">if</span> <span class="var">v</span> <span class="op">></span> <span class="var">mx</span> <span class="kw">then</span> <span class="var">mx</span> = <span class="var">v</span> <span class="kw">end</span>
+    <span class="kw">end</span>
+    <span class="kw">return</span> <span class="var">mn</span>, <span class="var">mx</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">lo</span>, <span class="var">hi</span> = <span class="fn">minmax</span>({<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>,<span class="num">5</span>,<span class="num">9</span>})
+<span class="fn">print</span>(<span class="var">lo</span>, <span class="var">hi</span>)   <span class="cmt">-- 1   9</span></code></pre>
+  <h2>Variadic Functions</h2>
+  <pre><code><span class="kw">function</span> <span class="fn">sum</span>(...)
+    <span class="kw">local</span> <span class="var">total</span> = <span class="num">0</span>
+    <span class="kw">for</span> <span class="var">_</span>, <span class="var">v</span> <span class="kw">in</span> <span class="fn">ipairs</span>({...}) <span class="kw">do</span>
+        <span class="var">total</span> = <span class="var">total</span> <span class="op">+</span> <span class="var">v</span>
+    <span class="kw">end</span>
+    <span class="kw">return</span> <span class="var">total</span>
+<span class="kw">end</span>
+<span class="fn">print</span>(<span class="fn">sum</span>(<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>))   <span class="cmt">-- 10</span>
+
+<span class="cmt">-- select('#', ...) counts varargs</span>
+<span class="kw">function</span> <span class="fn">count</span>(...) <span class="kw">return</span> <span class="fn">select</span>(<span class="str">'#'</span>, ...) <span class="kw">end</span></code></pre>
+  <h2>First-Class Functions</h2>
+  <pre><code><span class="cmt">-- Functions are values — pass them around</span>
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">apply</span>(<span class="var">fn</span>, <span class="var">x</span>) <span class="kw">return</span> <span class="fn">fn</span>(<span class="var">x</span>) <span class="kw">end</span>
+
+<span class="fn">print</span>(<span class="fn">apply</span>(<span class="fn">math.sqrt</span>, <span class="num">16</span>))   <span class="cmt">-- 4.0</span>
+
+<span class="cmt">-- Returning functions (factory)</span>
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">multiplier</span>(<span class="var">factor</span>)
+    <span class="kw">return</span> <span class="kw">function</span>(<span class="var">x</span>) <span class="kw">return</span> <span class="var">x</span> <span class="op">*</span> <span class="var">factor</span> <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="fn">double</span> = <span class="fn">multiplier</span>(<span class="num">2</span>)
+<span class="kw">local</span> <span class="fn">triple</span> = <span class="fn">multiplier</span>(<span class="num">3</span>)
+<span class="fn">print</span>(<span class="fn">double</span>(<span class="num">7</span>))   <span class="cmt">-- 14</span>
+<span class="fn">print</span>(<span class="fn">triple</span>(<span class="num">7</span>))   <span class="cmt">-- 21</span></code></pre>
+  <h2>Tail Calls</h2>
+  <pre><code><span class="cmt">-- Lua optimises proper tail calls — no stack overflow</span>
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">fact</span>(<span class="var">n</span>, <span class="var">acc</span>)
+    <span class="var">acc</span> = <span class="var">acc</span> <span class="kw">or</span> <span class="num">1</span>
+    <span class="kw">if</span> <span class="var">n</span> <span class="op"><=</span> <span class="num">1</span> <span class="kw">then</span> <span class="kw">return</span> <span class="var">acc</span> <span class="kw">end</span>
+    <span class="kw">return</span> <span class="fn">fact</span>(<span class="var">n</span><span class="op">-</span><span class="num">1</span>, <span class="var">n</span><span class="op">*</span><span class="var">acc</span>)   <span class="cmt">-- proper tail call</span>
+<span class="kw">end</span></code></pre>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">How do you access variadic arguments inside a Lua function?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q6" value="a"> arguments keyword</label>
+      <label><input type="radio" name="q6" value="b"> The ... expression</label>
+      <label><input type="radio" name="q6" value="c"> *args syntax</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q6','b',this)">Check</button>
+    <div class="quiz-result" id="q6-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(5)">← Back</button>
+    <button class="btn btn-primary" onclick="go(7)">Next →</button>
+  </div>
+</div>
+
+<!-- 07 TABLES ARRAYS -->
+<div class="section" id="s7">
+  <div class="sec-badge">Day 1 · Section 07</div>
+  <h1>Tables — Arrays</h1>
+  <p>Tables are Lua's only data structure. They serve as arrays, dicts, objects, and namespaces.</p>
+  <h2>Creating Arrays</h2>
+  <pre><code><span class="cmt">-- Lua arrays are 1-indexed!</span>
+<span class="kw">local</span> <span class="var">nums</span> = {<span class="num">10</span>, <span class="num">20</span>, <span class="num">30</span>, <span class="num">40</span>}
+<span class="fn">print</span>(<span class="var">nums</span>[<span class="num">1</span>])    <span class="cmt">-- 10  (NOT 0!)</span>
+<span class="fn">print</span>(<span class="var">nums</span>[<span class="num">4</span>])    <span class="cmt">-- 40</span>
+<span class="fn">print</span>(<span class="op">#</span><span class="var">nums</span>)     <span class="cmt">-- 4</span></code></pre>
+  <h2>Modifying Arrays</h2>
+  <pre><code><span class="kw">local</span> <span class="var">a</span> = {<span class="str">"x"</span>, <span class="str">"y"</span>, <span class="str">"z"</span>}
+
+<span class="cmt">-- Append</span>
+<span class="var">a</span>[<span class="op">#</span><span class="var">a</span><span class="op">+</span><span class="num">1</span>] = <span class="str">"w"</span>
+<span class="builtin">table.insert</span>(<span class="var">a</span>, <span class="str">"v"</span>)         <span class="cmt">-- append</span>
+<span class="builtin">table.insert</span>(<span class="var">a</span>, <span class="num">2</span>, <span class="str">"new"</span>)    <span class="cmt">-- insert at index 2</span>
+
+<span class="cmt">-- Remove</span>
+<span class="builtin">table.remove</span>(<span class="var">a</span>)              <span class="cmt">-- remove last</span>
+<span class="builtin">table.remove</span>(<span class="var">a</span>, <span class="num">1</span>)           <span class="cmt">-- remove first</span></code></pre>
+  <h2>Useful table Functions</h2>
+  <pre><code><span class="kw">local</span> <span class="var">t</span> = {<span class="num">5</span>, <span class="num">3</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">2</span>}
+<span class="builtin">table.sort</span>(<span class="var">t</span>)                          <span class="cmt">-- in-place sort</span>
+<span class="builtin">table.sort</span>(<span class="var">t</span>, <span class="kw">function</span>(<span class="var">a</span>,<span class="var">b</span>) <span class="kw">return</span> <span class="var">a</span><span class="op">></span><span class="var">b</span> <span class="kw">end</span>)  <span class="cmt">-- descending</span>
+
+<span class="kw">local</span> <span class="var">words</span> = {<span class="str">"hello"</span>, <span class="str">"world"</span>, <span class="str">"lua"</span>}
+<span class="fn">print</span>(<span class="builtin">table.concat</span>(<span class="var">words</span>, <span class="str">", "</span>))   <span class="cmt">-- "hello, world, lua"</span>
+
+<span class="cmt">-- table.move (Lua 5.3+): copy elements</span>
+<span class="kw">local</span> <span class="var">src</span> = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>}
+<span class="kw">local</span> <span class="var">dst</span> = {}
+<span class="builtin">table.move</span>(<span class="var">src</span>, <span class="num">1</span>, <span class="op">#</span><span class="var">src</span>, <span class="num">1</span>, <span class="var">dst</span>)   <span class="cmt">-- shallow copy</span></code></pre>
+  <h2>Iterating Arrays</h2>
+  <pre><code><span class="kw">local</span> <span class="var">colors</span> = {<span class="str">"red"</span>, <span class="str">"green"</span>, <span class="str">"blue"</span>}
+
+<span class="kw">for</span> <span class="var">i</span> = <span class="num">1</span>, <span class="op">#</span><span class="var">colors</span> <span class="kw">do</span>
+    <span class="fn">print</span>(<span class="var">i</span>, <span class="var">colors</span>[<span class="var">i</span>])
+<span class="kw">end</span>
+
+<span class="kw">for</span> <span class="var">i</span>, <span class="var">c</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">colors</span>) <span class="kw">do</span>
+    <span class="fn">print</span>(<span class="var">i</span>, <span class="var">c</span>)
+<span class="kw">end</span></code></pre>
+  <div class="warn">Never mix nil holes into an array — <code>#</code> has undefined behaviour on sequences with holes.</div>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What index does a Lua array start at?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q7" value="a"> 0</label>
+      <label><input type="radio" name="q7" value="b"> 1</label>
+      <label><input type="radio" name="q7" value="c"> Either, it's configurable</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q7','b',this)">Check</button>
+    <div class="quiz-result" id="q7-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(6)">← Back</button>
+    <button class="btn btn-primary" onclick="go(8)">Next →</button>
+  </div>
+</div>
+
+<!-- 08 TABLES DICTS -->
+<div class="section" id="s8">
+  <div class="sec-badge">Day 1 · Section 08</div>
+  <h1>Tables — Dicts, Nesting & Dispatch</h1>
+  <h2>Dictionary Tables</h2>
+  <pre><code><span class="kw">local</span> <span class="var">person</span> = {
+    name = <span class="str">"Zara"</span>,
+    age  = <span class="num">28</span>,
+    city = <span class="str">"Cairo"</span>,
+}
+
+<span class="fn">print</span>(<span class="var">person</span>.name)         <span class="cmt">-- "Zara"  (dot syntax)</span>
+<span class="fn">print</span>(<span class="var">person</span>[<span class="str">"age"</span>])      <span class="cmt">-- 28     (bracket syntax)</span>
+
+<span class="cmt">-- Add / update / delete</span>
+<span class="var">person</span>.email = <span class="str">"z@example.com"</span>
+<span class="var">person</span>.age = <span class="num">29</span>
+<span class="var">person</span>.city = <span class="kw">nil</span>           <span class="cmt">-- deletes the key</span></code></pre>
+  <h2>Nested Tables</h2>
+  <pre><code><span class="kw">local</span> <span class="var">data</span> = {
+    users = {
+        { id = <span class="num">1</span>, name = <span class="str">"Alice"</span> },
+        { id = <span class="num">2</span>, name = <span class="str">"Bob"</span>   },
+    },
+    count = <span class="num">2</span>,
+}
+
+<span class="fn">print</span>(<span class="var">data</span>.users[<span class="num">1</span>].name)   <span class="cmt">-- "Alice"</span>
+<span class="fn">print</span>(<span class="var">data</span>.count)            <span class="cmt">-- 2</span></code></pre>
+  <h2>Dispatch Tables (switch replacement)</h2>
+  <pre><code><span class="kw">local</span> <span class="var">handlers</span> = {
+    quit   = <span class="kw">function</span>() <span class="fn">print</span>(<span class="str">"Goodbye!"</span>) <span class="kw">end</span>,
+    help   = <span class="kw">function</span>() <span class="fn">print</span>(<span class="str">"Commands: quit, help, version"</span>) <span class="kw">end</span>,
+    version = <span class="kw">function</span>() <span class="fn">print</span>(<span class="str">"v1.0.0"</span>) <span class="kw">end</span>,
+}
+
+<span class="kw">local</span> <span class="var">cmd</span> = <span class="str">"help"</span>
+<span class="kw">local</span> <span class="var">fn</span> = <span class="var">handlers</span>[<span class="var">cmd</span>]
+<span class="kw">if</span> <span class="var">fn</span> <span class="kw">then</span>
+    <span class="fn">fn</span>()
+<span class="kw">else</span>
+    <span class="fn">print</span>(<span class="str">"Unknown command"</span>)
+<span class="kw">end</span></code></pre>
+  <h2>Mixed Tables</h2>
+  <pre><code><span class="cmt">-- Tables can have both integer and string keys</span>
+<span class="kw">local</span> <span class="var">mixed</span> = { <span class="str">"a"</span>, <span class="str">"b"</span>, x = <span class="num">10</span>, y = <span class="num">20</span> }
+<span class="fn">print</span>(<span class="var">mixed</span>[<span class="num">1</span>])   <span class="cmt">-- "a"</span>
+<span class="fn">print</span>(<span class="var">mixed</span>.x)   <span class="cmt">-- 10</span>
+<span class="fn">print</span>(<span class="op">#</span><span class="var">mixed</span>)    <span class="cmt">-- 2 (only counts sequence part)</span></code></pre>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">How do you delete a key from a Lua table?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q8" value="a"> table.delete(t, key)</label>
+      <label><input type="radio" name="q8" value="b"> Set the key's value to nil</label>
+      <label><input type="radio" name="q8" value="c"> del t[key]</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q8','b',this)">Check</button>
+    <div class="quiz-result" id="q8-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(7)">← Back</button>
+    <button class="btn btn-primary" onclick="go(9)">Next →</button>
+  </div>
+</div>
+
+<!-- 09 STRINGS -->
+<div class="section" id="s9">
+  <div class="sec-badge">Day 1 · Section 09</div>
+  <h1>Strings Deep Dive</h1>
+  <h2>string Library</h2>
+  <pre><code><span class="kw">local</span> <span class="var">s</span> = <span class="str">"Hello, World!"</span>
+
+<span class="fn">print</span>(<span class="builtin">string.len</span>(<span class="var">s</span>))               <span class="cmt">-- 13 (same as #s)</span>
+<span class="fn">print</span>(<span class="builtin">string.upper</span>(<span class="var">s</span>))             <span class="cmt">-- HELLO, WORLD!</span>
+<span class="fn">print</span>(<span class="builtin">string.lower</span>(<span class="var">s</span>))             <span class="cmt">-- hello, world!</span>
+<span class="fn">print</span>(<span class="builtin">string.rep</span>(<span class="str">"ab"</span>, <span class="num">3</span>))          <span class="cmt">-- ababab</span>
+<span class="fn">print</span>(<span class="builtin">string.rep</span>(<span class="str">"ab"</span>, <span class="num">3</span>, <span class="str">"-"</span>))     <span class="cmt">-- ab-ab-ab</span>
+<span class="fn">print</span>(<span class="builtin">string.reverse</span>(<span class="var">s</span>))           <span class="cmt">-- !dlroW ,olleH</span>
+<span class="fn">print</span>(<span class="builtin">string.sub</span>(<span class="var">s</span>, <span class="num">1</span>, <span class="num">5</span>))          <span class="cmt">-- Hello (1-indexed)</span>
+<span class="fn">print</span>(<span class="builtin">string.sub</span>(<span class="var">s</span>, <span class="op">-</span><span class="num">6</span>))            <span class="cmt">-- World! (negative = from end)</span>
+<span class="fn">print</span>(<span class="builtin">string.byte</span>(<span class="str">"A"</span>))             <span class="cmt">-- 65</span>
+<span class="fn">print</span>(<span class="builtin">string.char</span>(<span class="num">65</span>))              <span class="cmt">-- A</span></code></pre>
+  <h2>Method Syntax (colon)</h2>
+  <pre><code><span class="cmt">-- Strings have a metatable; methods work with colon</span>
+<span class="fn">print</span>(<span class="var">s</span>:<span class="fn">upper</span>())
+<span class="fn">print</span>(<span class="var">s</span>:<span class="fn">sub</span>(<span class="num">1</span>, <span class="num">5</span>))
+<span class="fn">print</span>(<span class="var">s</span>:<span class="fn">find</span>(<span class="str">"World"</span>))    <span class="cmt">-- 8  13 (start, end)</span></code></pre>
+  <h2>string.format</h2>
+  <pre><code><span class="fn">print</span>(<span class="builtin">string.format</span>(<span class="str">"Name: %s, Age: %d"</span>, <span class="str">"Zara"</span>, <span class="num">28</span>))
+<span class="fn">print</span>(<span class="builtin">string.format</span>(<span class="str">"Pi is %.4f"</span>, <span class="fn">math.pi</span>))    <span class="cmt">-- Pi is 3.1416</span>
+<span class="fn">print</span>(<span class="builtin">string.format</span>(<span class="str">"%05d"</span>, <span class="num">42</span>))              <span class="cmt">-- 00042</span>
+<span class="fn">print</span>(<span class="builtin">string.format</span>(<span class="str">"%x"</span>, <span class="num">255</span>))               <span class="cmt">-- ff</span></code></pre>
+  <h2>Patterns (Lua Regex)</h2>
+  <pre><code><span class="kw">local</span> <span class="var">text</span> = <span class="str">"The price is $42.50"</span>
+
+<span class="cmt">-- find: returns start, end pos</span>
+<span class="kw">local</span> <span class="var">s</span>, <span class="var">e</span> = <span class="var">text</span>:<span class="fn">find</span>(<span class="str">"%d+%.%d+"</span>)
+<span class="fn">print</span>(<span class="var">s</span>, <span class="var">e</span>)   <span class="cmt">-- 15  19</span>
+
+<span class="cmt">-- match: returns the matched portion</span>
+<span class="fn">print</span>(<span class="var">text</span>:<span class="fn">match</span>(<span class="str">"%d+%.%d+"</span>))   <span class="cmt">-- 42.50</span>
+
+<span class="cmt">-- gmatch: iterate all matches</span>
+<span class="kw">for</span> <span class="var">word</span> <span class="kw">in</span> <span class="var">text</span>:<span class="fn">gmatch</span>(<span class="str">"%a+"</span>) <span class="kw">do</span>
+    <span class="fn">io.write</span>(<span class="var">word</span> <span class="op">..</span> <span class="str">" "</span>)
+<span class="kw">end</span>   <span class="cmt">-- The price is</span>
+
+<span class="cmt">-- gsub: replace</span>
+<span class="fn">print</span>((<span class="var">text</span>:<span class="fn">gsub</span>(<span class="str">"price"</span>, <span class="str">"cost"</span>)))   <span class="cmt">-- The cost is $42.50</span></code></pre>
+  <h2>Pattern Classes</h2>
+  <table>
+    <tr><th>Pattern</th><th>Matches</th></tr>
+    <tr><td><code>%a</code></td><td>letters</td></tr>
+    <tr><td><code>%d</code></td><td>digits</td></tr>
+    <tr><td><code>%l</code></td><td>lowercase</td></tr>
+    <tr><td><code>%u</code></td><td>uppercase</td></tr>
+    <tr><td><code>%s</code></td><td>whitespace</td></tr>
+    <tr><td><code>%w</code></td><td>alphanumeric</td></tr>
+    <tr><td><code>%p</code></td><td>punctuation</td></tr>
+    <tr><td><code>.</code></td><td>any character</td></tr>
+    <tr><td><code>+</code></td><td>1 or more</td></tr>
+    <tr><td><code>*</code></td><td>0 or more</td></tr>
+    <tr><td><code>?</code></td><td>0 or 1</td></tr>
+    <tr><td><code>^</code></td><td>start of string</td></tr>
+    <tr><td><code>$</code></td><td>end of string</td></tr>
+  </table>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What does <code>string.format("%05d", 7)</code> produce?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q9" value="a"> "7    "</label>
+      <label><input type="radio" name="q9" value="b"> "00007"</label>
+      <label><input type="radio" name="q9" value="c"> "5d"</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q9','b',this)">Check</button>
+    <div class="quiz-result" id="q9-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(8)">← Back</button>
+    <button class="btn btn-primary" onclick="go(10)">Next →</button>
+  </div>
+</div>
+
+<!-- 10 DAY 1 PROJECT -->
+<div class="section" id="s10">
+  <div class="sec-badge">Day 1 · Project</div>
+  <h1>Day 1 Project — Text Adventure</h1>
+  <p>Build a small interactive text adventure that uses everything from Day 1. Here's a complete working version:</p>
+  <pre><code><span class="cmt">-- text_adventure.lua</span>
+
+<span class="kw">local</span> <span class="var">player</span> = { name = <span class="str">""</span>, hp = <span class="num">100</span>, gold = <span class="num">0</span>, inventory = {} }
+
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">prompt</span>(<span class="var">msg</span>)
+    <span class="fn">io.write</span>(<span class="var">msg</span>)
+    <span class="kw">return</span> <span class="fn">io.read</span>()
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">addItem</span>(<span class="var">item</span>)
+    <span class="var">player</span>.inventory[<span class="op">#</span><span class="var">player</span>.inventory <span class="op">+</span> <span class="num">1</span>] = <span class="var">item</span>
+    <span class="fn">print</span>(<span class="str">"  + Added: "</span> <span class="op">..</span> <span class="var">item</span>)
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">showInventory</span>()
+    <span class="kw">if</span> <span class="op">#</span><span class="var">player</span>.inventory <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span>
+        <span class="fn">print</span>(<span class="str">"  (empty)"</span>)
+    <span class="kw">else</span>
+        <span class="kw">for</span> <span class="var">i</span>, <span class="var">item</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">player</span>.inventory) <span class="kw">do</span>
+            <span class="fn">print</span>(<span class="builtin">string.format</span>(<span class="str">"  %d. %s"</span>, <span class="var">i</span>, <span class="var">item</span>))
+        <span class="kw">end</span>
+    <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">rooms</span> = {
+    forest = {
+        desc = <span class="str">"A dark forest. Paths lead north and east."</span>,
+        actions = {
+            search = <span class="kw">function</span>()
+                <span class="fn">print</span>(<span class="str">"You find a rusty sword!"</span>)
+                <span class="fn">addItem</span>(<span class="str">"rusty sword"</span>)
+            <span class="kw">end</span>,
+            north = <span class="kw">function</span>() <span class="kw">return</span> <span class="str">"cave"</span> <span class="kw">end</span>,
+            east  = <span class="kw">function</span>() <span class="kw">return</span> <span class="str">"village"</span> <span class="kw">end</span>,
+        }
+    },
+    cave = {
+        desc = <span class="str">"A damp cave. A chest sits in the corner."</span>,
+        actions = {
+            open  = <span class="kw">function</span>() <span class="var">player</span>.gold = <span class="var">player</span>.gold <span class="op">+</span> <span class="num">50</span>; <span class="fn">print</span>(<span class="str">"Found 50 gold!"</span>) <span class="kw">end</span>,
+            south = <span class="kw">function</span>() <span class="kw">return</span> <span class="str">"forest"</span> <span class="kw">end</span>,
+        }
+    },
+    village = {
+        desc = <span class="str">"A peaceful village. You can rest or buy here."</span>,
+        actions = {
+            rest  = <span class="kw">function</span>() <span class="var">player</span>.hp = <span class="num">100</span>; <span class="fn">print</span>(<span class="str">"Fully rested!"</span>) <span class="kw">end</span>,
+            west  = <span class="kw">function</span>() <span class="kw">return</span> <span class="str">"forest"</span> <span class="kw">end</span>,
+        }
+    },
+}
+
+<span class="cmt">-- Main game loop</span>
+<span class="var">player</span>.name = <span class="fn">prompt</span>(<span class="str">"Enter your name: "</span>)
+<span class="fn">print</span>(<span class="str">"\nWelcome, "</span> <span class="op">..</span> <span class="var">player</span>.name <span class="op">..</span> <span class="str">"! Type 'help' for commands.\n"</span>)
+
+<span class="kw">local</span> <span class="var">current</span> = <span class="str">"forest"</span>
+
+<span class="kw">while</span> <span class="kw">true</span> <span class="kw">do</span>
+    <span class="kw">local</span> <span class="var">room</span> = <span class="var">rooms</span>[<span class="var">current</span>]
+    <span class="fn">print</span>(<span class="str">"\n["</span> <span class="op">..</span> <span class="var">current</span>:<span class="fn">upper</span>() <span class="op">..</span> <span class="str">"] "</span> <span class="op">..</span> <span class="var">room</span>.desc)
+    <span class="fn">print</span>(<span class="builtin">string.format</span>(<span class="str">"HP:%d  Gold:%d"</span>, <span class="var">player</span>.hp, <span class="var">player</span>.gold))
+
+    <span class="kw">local</span> <span class="var">input</span> = <span class="fn">prompt</span>(<span class="str">"&gt; "</span>):<span class="fn">lower</span>():<span class="fn">match</span>(<span class="str">"^%s*(.-)%s*$"</span>)
+
+    <span class="kw">if</span> <span class="var">input</span> <span class="op">==</span> <span class="str">"quit"</span> <span class="kw">then</span>
+        <span class="fn">print</span>(<span class="str">"Farewell, "</span> <span class="op">..</span> <span class="var">player</span>.name <span class="op">..</span> <span class="str">"!"</span>); <span class="kw">break</span>
+    <span class="kw">elseif</span> <span class="var">input</span> <span class="op">==</span> <span class="str">"help"</span> <span class="kw">then</span>
+        <span class="fn">print</span>(<span class="str">"Commands: "</span> <span class="op">..</span> <span class="builtin">table.concat</span>({<span class="str">"help"</span>,<span class="str">"inv"</span>,<span class="str">"quit"</span>}, <span class="str">", "</span>))
+        <span class="kw">for</span> <span class="var">k</span> <span class="kw">in</span> <span class="fn">pairs</span>(<span class="var">room</span>.actions) <span class="kw">do</span> <span class="fn">io.write</span>(<span class="var">k</span> <span class="op">..</span> <span class="str">" "</span>) <span class="kw">end</span>; <span class="fn">print</span>()
+    <span class="kw">elseif</span> <span class="var">input</span> <span class="op">==</span> <span class="str">"inv"</span> <span class="kw">then</span>
+        <span class="fn">showInventory</span>()
+    <span class="kw">else</span>
+        <span class="kw">local</span> <span class="var">action</span> = <span class="var">room</span>.actions[<span class="var">input</span>]
+        <span class="kw">if</span> <span class="var">action</span> <span class="kw">then</span>
+            <span class="kw">local</span> <span class="var">dest</span> = <span class="fn">action</span>()
+            <span class="kw">if</span> <span class="var">dest</span> <span class="kw">then</span> <span class="var">current</span> = <span class="var">dest</span> <span class="kw">end</span>
+        <span class="kw">else</span>
+            <span class="fn">print</span>(<span class="str">"Unknown command."</span>)
+        <span class="kw">end</span>
+    <span class="kw">end</span>
+<span class="kw">end</span></code></pre>
+  <div class="tip">Save this as <code>adventure.lua</code> and run it with <code>lua adventure.lua</code>. Extend it — add combat, more rooms, item use!</div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(9)">← Back</button>
+    <button class="btn btn-primary" onclick="go(11)">Start Day 2 →</button>
+  </div>
+</div>
+
+<!-- 11 SCOPE & CLOSURES -->
+<div class="section" id="s11">
+  <div class="sec-badge">Day 2 · Section 11</div>
+  <h1>Scope & Closures</h1>
+  <h2>Local vs Global</h2>
+  <pre><code><span class="var">x</span> = <span class="num">10</span>          <span class="cmt">-- global: accessible everywhere, lives in _G</span>
+<span class="kw">local</span> <span class="var">y</span> = <span class="num">20</span>    <span class="cmt">-- local: only visible in its block</span>
+
+<span class="kw">do</span>
+    <span class="kw">local</span> <span class="var">z</span> = <span class="num">30</span>   <span class="cmt">-- block-scoped</span>
+    <span class="fn">print</span>(<span class="var">z</span>)        <span class="cmt">-- 30 ✓</span>
+<span class="kw">end</span>
+<span class="cmt">-- print(z)  → nil (z is gone)</span>
+
+<span class="cmt">-- Always use local! Globals are 40% slower and pollute namespace</span></code></pre>
+  <h2>Closures & Upvalues</h2>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">makeCounter</span>(<span class="var">start</span>)
+    <span class="kw">local</span> <span class="var">count</span> = <span class="var">start</span> <span class="kw">or</span> <span class="num">0</span>   <span class="cmt">-- upvalue</span>
+    <span class="kw">return</span> {
+        inc  = <span class="kw">function</span>() <span class="var">count</span> = <span class="var">count</span> <span class="op">+</span> <span class="num">1</span> <span class="kw">end</span>,
+        dec  = <span class="kw">function</span>() <span class="var">count</span> = <span class="var">count</span> <span class="op">-</span> <span class="num">1</span> <span class="kw">end</span>,
+        get  = <span class="kw">function</span>() <span class="kw">return</span> <span class="var">count</span> <span class="kw">end</span>,
+    }
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">c</span> = <span class="fn">makeCounter</span>(<span class="num">10</span>)
+<span class="var">c</span>.<span class="fn">inc</span>(); <span class="var">c</span>.<span class="fn">inc</span>()
+<span class="fn">print</span>(<span class="var">c</span>.<span class="fn">get</span>())   <span class="cmt">-- 12</span>
+<span class="cmt">-- 'count' is private — encapsulated by closure</span></code></pre>
+  <h2>Shared Upvalues</h2>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">sharedState</span>()
+    <span class="kw">local</span> <span class="var">val</span> = <span class="num">0</span>
+    <span class="kw">local</span> <span class="kw">function</span> <span class="fn">get</span>() <span class="kw">return</span> <span class="var">val</span> <span class="kw">end</span>
+    <span class="kw">local</span> <span class="kw">function</span> <span class="fn">set</span>(<span class="var">v</span>) <span class="var">val</span> = <span class="var">v</span> <span class="kw">end</span>
+    <span class="cmt">-- get and set share the SAME upvalue 'val'</span>
+    <span class="kw">return</span> <span class="fn">get</span>, <span class="fn">set</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="fn">get</span>, <span class="fn">set</span> = <span class="fn">sharedState</span>()
+<span class="fn">set</span>(<span class="num">42</span>)
+<span class="fn">print</span>(<span class="fn">get</span>())   <span class="cmt">-- 42</span></code></pre>
+  <div class="tip">Closures are the foundation of Lua OOP, modules, and coroutines. Master them and everything else becomes clear.</div>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What is an "upvalue" in Lua?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q11" value="a"> A global variable</label>
+      <label><input type="radio" name="q11" value="b"> A local variable captured by a closure from an outer scope</label>
+      <label><input type="radio" name="q11" value="c"> A return value</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q11','b',this)">Check</button>
+    <div class="quiz-result" id="q11-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(10)">← Back</button>
+    <button class="btn btn-primary" onclick="go(12)">Next →</button>
+  </div>
+</div>
+
+<!-- 12 METATABLES & OOP -->
+<div class="section" id="s12">
+  <div class="sec-badge">Day 2 · Section 12</div>
+  <h1>Metatables & OOP</h1>
+  <h2>What is a Metatable?</h2>
+  <p>A metatable lets you customise how a table behaves — arithmetic, comparison, string conversion, and crucially: method lookup via <code>__index</code>.</p>
+  <h2>__index — Method Lookup</h2>
+  <pre><code><span class="kw">local</span> <span class="var">Animal</span> = {}
+<span class="var">Animal</span>.__index = <span class="var">Animal</span>   <span class="cmt">-- metamethod: look up missing keys here</span>
+
+<span class="kw">function</span> <span class="var">Animal</span>.<span class="fn">new</span>(<span class="var">name</span>, <span class="var">sound</span>)
+    <span class="kw">local</span> <span class="var">self</span> = <span class="fn">setmetatable</span>({}, <span class="var">Animal</span>)
+    <span class="var">self</span>.name  = <span class="var">name</span>
+    <span class="var">self</span>.sound = <span class="var">sound</span>
+    <span class="kw">return</span> <span class="var">self</span>
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Animal</span>:<span class="fn">speak</span>()    <span class="cmt">-- colon = implicit 'self' parameter</span>
+    <span class="fn">print</span>(<span class="var">self</span>.name <span class="op">..</span> <span class="str">" says "</span> <span class="op">..</span> <span class="var">self</span>.sound)
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Animal</span>:<span class="fn">__tostring</span>()
+    <span class="kw">return</span> <span class="str">"Animal("</span> <span class="op">..</span> <span class="var">self</span>.name <span class="op">..</span> <span class="str">")"</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">cat</span> = <span class="var">Animal</span>.<span class="fn">new</span>(<span class="str">"Cat"</span>, <span class="str">"Meow"</span>)
+<span class="var">cat</span>:<span class="fn">speak</span>()   <span class="cmt">-- Cat says Meow</span></code></pre>
+  <h2>Key Metamethods</h2>
+  <table>
+    <tr><th>Metamethod</th><th>Triggered by</th></tr>
+    <tr><td><code>__index</code></td><td>Missing key access</td></tr>
+    <tr><td><code>__newindex</code></td><td>Setting a new key</td></tr>
+    <tr><td><code>__tostring</code></td><td><code>tostring(obj)</code></td></tr>
+    <tr><td><code>__len</code></td><td><code>#obj</code></td></tr>
+    <tr><td><code>__add</code></td><td><code>a + b</code></td></tr>
+    <tr><td><code>__eq</code></td><td><code>a == b</code></td></tr>
+    <tr><td><code>__lt</code></td><td><code>a &lt; b</code></td></tr>
+    <tr><td><code>__call</code></td><td><code>obj(...)</code></td></tr>
+    <tr><td><code>__gc</code></td><td>Garbage collection</td></tr>
+  </table>
+  <h2>__call and __newindex Example</h2>
+  <pre><code><span class="kw">local</span> <span class="var">Vector</span> = {}
+<span class="var">Vector</span>.__index = <span class="var">Vector</span>
+
+<span class="kw">function</span> <span class="var">Vector</span>.<span class="fn">new</span>(<span class="var">x</span>, <span class="var">y</span>)
+    <span class="kw">return</span> <span class="fn">setmetatable</span>({x=<span class="var">x</span>, y=<span class="var">y</span>}, <span class="var">Vector</span>)
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Vector</span>:<span class="fn">__add</span>(<span class="var">other</span>)
+    <span class="kw">return</span> <span class="var">Vector</span>.<span class="fn">new</span>(<span class="var">self</span>.x <span class="op">+</span> <span class="var">other</span>.x, <span class="var">self</span>.y <span class="op">+</span> <span class="var">other</span>.y)
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Vector</span>:<span class="fn">__tostring</span>()
+    <span class="kw">return</span> <span class="builtin">string.format</span>(<span class="str">"(%g, %g)"</span>, <span class="var">self</span>.x, <span class="var">self</span>.y)
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">v1</span> = <span class="var">Vector</span>.<span class="fn">new</span>(<span class="num">1</span>, <span class="num">2</span>)
+<span class="kw">local</span> <span class="var">v2</span> = <span class="var">Vector</span>.<span class="fn">new</span>(<span class="num">3</span>, <span class="num">4</span>)
+<span class="fn">print</span>(<span class="fn">tostring</span>(<span class="var">v1</span> <span class="op">+</span> <span class="var">v2</span>))   <span class="cmt">-- (4, 6)</span></code></pre>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What does <code>setmetatable(t, mt)</code> do?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q12" value="a"> Copies mt's keys into t</label>
+      <label><input type="radio" name="q12" value="b"> Attaches mt as the metatable for t, controlling t's behaviour</label>
+      <label><input type="radio" name="q12" value="c"> Makes t inherit from mt directly</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q12','b',this)">Check</button>
+    <div class="quiz-result" id="q12-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(11)">← Back</button>
+    <button class="btn btn-primary" onclick="go(13)">Next →</button>
+  </div>
+</div>
+
+<!-- 13 INHERITANCE -->
+<div class="section" id="s13">
+  <div class="sec-badge">Day 2 · Section 13</div>
+  <h1>Inheritance & Mixins</h1>
+  <h2>Single Inheritance</h2>
+  <pre><code><span class="cmt">-- Base class</span>
+<span class="kw">local</span> <span class="var">Shape</span> = {}
+<span class="var">Shape</span>.__index = <span class="var">Shape</span>
+
+<span class="kw">function</span> <span class="var">Shape</span>.<span class="fn">new</span>(<span class="var">color</span>)
+    <span class="kw">return</span> <span class="fn">setmetatable</span>({ color = <span class="var">color</span> <span class="kw">or</span> <span class="str">"white"</span> }, <span class="var">Shape</span>)
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Shape</span>:<span class="fn">describe</span>()
+    <span class="fn">print</span>(<span class="str">"Shape: color="</span> <span class="op">..</span> <span class="var">self</span>.color)
+<span class="kw">end</span>
+
+<span class="cmt">-- Derived class</span>
+<span class="kw">local</span> <span class="var">Circle</span> = <span class="fn">setmetatable</span>({}, { __index = <span class="var">Shape</span> })
+<span class="var">Circle</span>.__index = <span class="var">Circle</span>
+
+<span class="kw">function</span> <span class="var">Circle</span>.<span class="fn">new</span>(<span class="var">radius</span>, <span class="var">color</span>)
+    <span class="kw">local</span> <span class="var">self</span> = <span class="var">Shape</span>.<span class="fn">new</span>(<span class="var">color</span>)          <span class="cmt">-- call parent constructor</span>
+    <span class="var">self</span>.radius = <span class="var">radius</span>
+    <span class="kw">return</span> <span class="fn">setmetatable</span>(<span class="var">self</span>, <span class="var">Circle</span>)
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Circle</span>:<span class="fn">area</span>()
+    <span class="kw">return</span> <span class="fn">math.pi</span> <span class="op">*</span> <span class="var">self</span>.radius <span class="op">^</span> <span class="num">2</span>
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Circle</span>:<span class="fn">describe</span>()           <span class="cmt">-- override</span>
+    <span class="var">Shape</span>.<span class="fn">describe</span>(<span class="var">self</span>)              <span class="cmt">-- call super</span>
+    <span class="fn">print</span>(<span class="str">"Circle: radius="</span> <span class="op">..</span> <span class="var">self</span>.radius)
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">c</span> = <span class="var">Circle</span>.<span class="fn">new</span>(<span class="num">5</span>, <span class="str">"red"</span>)
+<span class="var">c</span>:<span class="fn">describe</span>()
+<span class="fn">print</span>(<span class="builtin">string.format</span>(<span class="str">"Area: %.2f"</span>, <span class="var">c</span>:<span class="fn">area</span>()))   <span class="cmt">-- Area: 78.54</span></code></pre>
+  <h2>Mixins</h2>
+  <pre><code><span class="cmt">-- A mixin is just a table of functions you copy in</span>
+<span class="kw">local</span> <span class="var">Serializable</span> = {
+    serialize = <span class="kw">function</span>(<span class="var">self</span>)
+        <span class="kw">local</span> <span class="var">parts</span> = {}
+        <span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="fn">pairs</span>(<span class="var">self</span>) <span class="kw">do</span>
+            <span class="var">parts</span>[<span class="op">#</span><span class="var">parts</span><span class="op">+</span><span class="num">1</span>] = <span class="var">k</span> <span class="op">..</span> <span class="str">"="</span> <span class="op">..</span> <span class="fn">tostring</span>(<span class="var">v</span>)
+        <span class="kw">end</span>
+        <span class="kw">return</span> <span class="str">"{"</span> <span class="op">..</span> <span class="builtin">table.concat</span>(<span class="var">parts</span>, <span class="str">","</span>) <span class="op">..</span> <span class="str">"}"</span>
+    <span class="kw">end</span>
+}
+
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">mixin</span>(<span class="var">target</span>, <span class="var">source</span>)
+    <span class="kw">for</span> <span class="var">k</span>, <span class="var">v</span> <span class="kw">in</span> <span class="fn">pairs</span>(<span class="var">source</span>) <span class="kw">do</span>
+        <span class="var">target</span>[<span class="var">k</span>] = <span class="var">v</span>
+    <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="fn">mixin</span>(<span class="var">Circle</span>, <span class="var">Serializable</span>)
+<span class="fn">print</span>(<span class="var">c</span>:<span class="fn">serialize</span>())   <span class="cmt">-- {color=red,radius=5}</span></code></pre>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(12)">← Back</button>
+    <button class="btn btn-primary" onclick="go(14)">Next →</button>
+  </div>
+</div>
+
+<!-- 14 ERROR HANDLING -->
+<div class="section" id="s14">
+  <div class="sec-badge">Day 2 · Section 14</div>
+  <h1>Error Handling</h1>
+  <h2>pcall — Protected Call</h2>
+  <pre><code><span class="kw">local</span> <span class="var">ok</span>, <span class="var">err</span> = <span class="fn">pcall</span>(<span class="kw">function</span>()
+    <span class="kw">error</span>(<span class="str">"something went wrong"</span>)
+<span class="kw">end</span>)
+
+<span class="fn">print</span>(<span class="var">ok</span>)    <span class="cmt">-- false</span>
+<span class="fn">print</span>(<span class="var">err</span>)   <span class="cmt">-- input:2: something went wrong</span>
+
+<span class="cmt">-- pcall returns all return values on success</span>
+<span class="kw">local</span> <span class="var">ok2</span>, <span class="var">val</span> = <span class="fn">pcall</span>(<span class="kw">function</span>() <span class="kw">return</span> <span class="num">42</span> <span class="kw">end</span>)
+<span class="fn">print</span>(<span class="var">ok2</span>, <span class="var">val</span>)   <span class="cmt">-- true   42</span></code></pre>
+  <h2>xpcall — With Traceback</h2>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">errHandler</span>(<span class="var">msg</span>)
+    <span class="kw">return</span> <span class="fn">debug.traceback</span>(<span class="var">msg</span>, <span class="num">2</span>)
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">ok</span>, <span class="var">err</span> = <span class="fn">xpcall</span>(<span class="kw">function</span>()
+    <span class="kw">error</span>(<span class="str">"oops"</span>)
+<span class="kw">end</span>, <span class="fn">errHandler</span>)
+
+<span class="fn">print</span>(<span class="var">err</span>)   <span class="cmt">-- full stack traceback</span></code></pre>
+  <h2>error() with Objects</h2>
+  <pre><code><span class="cmt">-- Pass level 2 to blame the caller, not this function</span>
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">assertPositive</span>(<span class="var">n</span>)
+    <span class="kw">if</span> <span class="var">n</span> <span class="op"><=</span> <span class="num">0</span> <span class="kw">then</span>
+        <span class="kw">error</span>(<span class="str">"expected positive number, got: "</span> <span class="op">..</span> <span class="var">n</span>, <span class="num">2</span>)
+    <span class="kw">end</span>
+    <span class="kw">return</span> <span class="var">n</span>
+<span class="kw">end</span>
+
+<span class="cmt">-- Structured errors (pass a table instead of a string)</span>
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">riskyOp</span>()
+    <span class="kw">error</span>({ code = <span class="num">404</span>, msg = <span class="str">"not found"</span> })
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">ok</span>, <span class="var">err</span> = <span class="fn">pcall</span>(<span class="fn">riskyOp</span>)
+<span class="kw">if</span> <span class="kw">not</span> <span class="var">ok</span> <span class="kw">then</span>
+    <span class="fn">print</span>(<span class="var">err</span>.code, <span class="var">err</span>.msg)   <span class="cmt">-- 404  not found</span>
+<span class="kw">end</span></code></pre>
+  <h2>assert</h2>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">divide</span>(<span class="var">a</span>, <span class="var">b</span>)
+    <span class="fn">assert</span>(<span class="var">b</span> <span class="op">~=</span> <span class="num">0</span>, <span class="str">"division by zero"</span>)
+    <span class="kw">return</span> <span class="var">a</span> <span class="op">/</span> <span class="var">b</span>
+<span class="kw">end</span></code></pre>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What does <code>pcall(f)</code> return when <code>f</code> throws an error?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q14" value="a"> It re-throws the error</label>
+      <label><input type="radio" name="q14" value="b"> false, error_message</label>
+      <label><input type="radio" name="q14" value="c"> nil</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q14','b',this)">Check</button>
+    <div class="quiz-result" id="q14-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(13)">← Back</button>
+    <button class="btn btn-primary" onclick="go(15)">Next →</button>
+  </div>
+</div>
+
+<!-- 15 MODULES -->
+<div class="section" id="s15">
+  <div class="sec-badge">Day 2 · Section 15</div>
+  <h1>Modules & Packages</h1>
+  <h2>Creating a Module</h2>
+  <pre><code><span class="cmt">-- File: mymath.lua</span>
+<span class="kw">local</span> <span class="var">M</span> = {}
+
+<span class="kw">function</span> <span class="var">M</span>.<span class="fn">clamp</span>(<span class="var">v</span>, <span class="var">lo</span>, <span class="var">hi</span>)
+    <span class="kw">return</span> <span class="fn">math.max</span>(<span class="var">lo</span>, <span class="fn">math.min</span>(<span class="var">hi</span>, <span class="var">v</span>))
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">M</span>.<span class="fn">lerp</span>(<span class="var">a</span>, <span class="var">b</span>, <span class="var">t</span>)
+    <span class="kw">return</span> <span class="var">a</span> <span class="op">+</span> (<span class="var">b</span> <span class="op">-</span> <span class="var">a</span>) <span class="op">*</span> <span class="var">t</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">private</span>()  <span class="cmt">-- not in M, so not exported</span>
+    <span class="kw">return</span> <span class="str">"secret"</span>
+<span class="kw">end</span>
+
+<span class="kw">return</span> <span class="var">M</span></code></pre>
+  <h2>Using a Module</h2>
+  <pre><code><span class="cmt">-- File: main.lua</span>
+<span class="kw">local</span> <span class="var">mm</span> = <span class="fn">require</span>(<span class="str">"mymath"</span>)   <span class="cmt">-- .lua extension omitted</span>
+
+<span class="fn">print</span>(<span class="var">mm</span>.<span class="fn">clamp</span>(<span class="num">150</span>, <span class="num">0</span>, <span class="num">100</span>))   <span class="cmt">-- 100</span>
+<span class="fn">print</span>(<span class="var">mm</span>.<span class="fn">lerp</span>(<span class="num">0</span>, <span class="num">10</span>, <span class="num">0.3</span>))     <span class="cmt">-- 3.0</span></code></pre>
+  <h2>require Caching</h2>
+  <pre><code><span class="cmt">-- require caches in package.loaded
+-- calling require twice returns the SAME table
+local a = require("mymath")
+local b = require("mymath")
+print(a == b)   -- true
+
+-- Force reload (rarely needed):
+package.loaded["mymath"] = nil
+local fresh = require("mymath")</span></code></pre>
+  <h2>package.path</h2>
+  <pre><code><span class="cmt">-- Lua searches these paths for modules:</span>
+<span class="fn">print</span>(<span class="var">package</span>.path)
+<span class="cmt">-- typical: ./?.lua;/usr/share/lua/5.4/?.lua; ...</span>
+
+<span class="cmt">-- Add your own path:</span>
+<span class="var">package</span>.path = <span class="var">package</span>.path <span class="op">..</span> <span class="str">";./libs/?.lua"</span></code></pre>
+  <div class="tip">LuaRocks is the package manager for Lua. Install it and use <code>luarocks install &lt;package&gt;</code> to add community libraries.</div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(14)">← Back</button>
+    <button class="btn btn-primary" onclick="go(16)">Next →</button>
+  </div>
+</div>
+
+<!-- 16 COROUTINES -->
+<div class="section" id="s16">
+  <div class="sec-badge">Day 2 · Section 16</div>
+  <h1>Coroutines</h1>
+  <p>Coroutines are cooperative threads — they pause and resume, sharing a single OS thread. Essential for async-style code, generators, and state machines.</p>
+  <h2>Basic Coroutine</h2>
+  <pre><code><span class="kw">local</span> <span class="var">co</span> = <span class="fn">coroutine.create</span>(<span class="kw">function</span>(<span class="var">a</span>, <span class="var">b</span>)
+    <span class="fn">print</span>(<span class="str">"start"</span>, <span class="var">a</span>, <span class="var">b</span>)
+    <span class="kw">local</span> <span class="var">c</span> = <span class="fn">coroutine.yield</span>(<span class="var">a</span> <span class="op">+</span> <span class="var">b</span>)   <span class="cmt">-- pause, send a+b out</span>
+    <span class="fn">print</span>(<span class="str">"resumed with"</span>, <span class="var">c</span>)
+    <span class="kw">return</span> <span class="str">"done"</span>
+<span class="kw">end</span>)
+
+<span class="kw">local</span> <span class="var">ok</span>, <span class="var">v1</span> = <span class="fn">coroutine.resume</span>(<span class="var">co</span>, <span class="num">10</span>, <span class="num">20</span>)
+<span class="fn">print</span>(<span class="var">ok</span>, <span class="var">v1</span>)         <span class="cmt">-- true  30  (value from yield)</span>
+
+<span class="kw">local</span> <span class="var">ok2</span>, <span class="var">v2</span> = <span class="fn">coroutine.resume</span>(<span class="var">co</span>, <span class="num">99</span>)
+<span class="fn">print</span>(<span class="var">ok2</span>, <span class="var">v2</span>)        <span class="cmt">-- true  done  (return value)</span></code></pre>
+  <h2>Generator Pattern</h2>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">range</span>(<span class="var">n</span>)
+    <span class="kw">return</span> <span class="fn">coroutine.wrap</span>(<span class="kw">function</span>()
+        <span class="kw">for</span> <span class="var">i</span> = <span class="num">1</span>, <span class="var">n</span> <span class="kw">do</span>
+            <span class="fn">coroutine.yield</span>(<span class="var">i</span>)
+        <span class="kw">end</span>
+    <span class="kw">end</span>)
+<span class="kw">end</span>
+
+<span class="kw">for</span> <span class="var">v</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>) <span class="kw">do</span>
+    <span class="fn">io.write</span>(<span class="var">v</span> <span class="op">..</span> <span class="str">" "</span>)    <span class="cmt">-- 1 2 3 4 5</span>
+<span class="kw">end</span></code></pre>
+  <h2>Coroutine States</h2>
+  <table>
+    <tr><th>State</th><th>Meaning</th></tr>
+    <tr><td>suspended</td><td>Not yet started, or yielded</td></tr>
+    <tr><td>running</td><td>Currently executing</td></tr>
+    <tr><td>normal</td><td>Resumed another coroutine</td></tr>
+    <tr><td>dead</td><td>Finished or errored</td></tr>
+  </table>
+  <pre><code><span class="fn">print</span>(<span class="fn">coroutine.status</span>(<span class="var">co</span>))   <span class="cmt">-- "dead" after it finishes</span></code></pre>
+  <h2>Producer–Consumer</h2>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">producer</span>()
+    <span class="kw">local</span> <span class="var">items</span> = {<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>}
+    <span class="kw">for</span> <span class="var">_</span>, <span class="var">v</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">items</span>) <span class="kw">do</span>
+        <span class="fn">coroutine.yield</span>(<span class="var">v</span>)
+    <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">p</span> = <span class="fn">coroutine.wrap</span>(<span class="fn">producer</span>)
+<span class="kw">while</span> <span class="kw">true</span> <span class="kw">do</span>
+    <span class="kw">local</span> <span class="var">item</span> = <span class="fn">p</span>()
+    <span class="kw">if</span> <span class="var">item</span> <span class="op">==</span> <span class="kw">nil</span> <span class="kw">then</span> <span class="kw">break</span> <span class="kw">end</span>
+    <span class="fn">print</span>(<span class="str">"consumed: "</span> <span class="op">..</span> <span class="var">item</span>)
+<span class="kw">end</span></code></pre>
+  <div class="quiz">
+    <h4>Quick Check</h4>
+    <div class="quiz-q">What function pauses a coroutine and passes a value out?</div>
+    <div class="quiz-opts">
+      <label><input type="radio" name="q16" value="a"> coroutine.pause()</label>
+      <label><input type="radio" name="q16" value="b"> coroutine.yield()</label>
+      <label><input type="radio" name="q16" value="c"> coroutine.sleep()</label>
+    </div>
+    <button class="btn btn-secondary check-btn" onclick="check('q16','b',this)">Check</button>
+    <div class="quiz-result" id="q16-res"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(15)">← Back</button>
+    <button class="btn btn-primary" onclick="go(17)">Next →</button>
+  </div>
+</div>
+
+<!-- 17 FILE I/O -->
+<div class="section" id="s17">
+  <div class="sec-badge">Day 2 · Section 17</div>
+  <h1>File I/O & Standard Libraries</h1>
+  <h2>Reading Files</h2>
+  <pre><code><span class="cmt">-- Read entire file</span>
+<span class="kw">local</span> <span class="var">f</span> = <span class="fn">io.open</span>(<span class="str">"data.txt"</span>, <span class="str">"r"</span>)
+<span class="kw">if</span> <span class="var">f</span> <span class="kw">then</span>
+    <span class="kw">local</span> <span class="var">content</span> = <span class="var">f</span>:<span class="fn">read</span>(<span class="str">"*a"</span>)   <span class="cmt">-- *a = all, *l = line, *n = number</span>
+    <span class="var">f</span>:<span class="fn">close</span>()
+    <span class="fn">print</span>(<span class="var">content</span>)
+<span class="kw">end</span>
+
+<span class="cmt">-- Line by line</span>
+<span class="kw">for</span> <span class="var">line</span> <span class="kw">in</span> <span class="fn">io.lines</span>(<span class="str">"data.txt"</span>) <span class="kw">do</span>
+    <span class="fn">print</span>(<span class="var">line</span>)
+<span class="kw">end</span></code></pre>
+  <h2>Writing Files</h2>
+  <pre><code><span class="kw">local</span> <span class="var">f</span> = <span class="fn">io.open</span>(<span class="str">"out.txt"</span>, <span class="str">"w"</span>)
+<span class="var">f</span>:<span class="fn">write</span>(<span class="str">"Hello\n"</span>)
+<span class="var">f</span>:<span class="fn">write</span>(<span class="builtin">string.format</span>(<span class="str">"Value: %d\n"</span>, <span class="num">42</span>))
+<span class="var">f</span>:<span class="fn">close</span>()
+
+<span class="cmt">-- Append mode</span>
+<span class="kw">local</span> <span class="var">g</span> = <span class="fn">io.open</span>(<span class="str">"out.txt"</span>, <span class="str">"a"</span>)
+<span class="var">g</span>:<span class="fn">write</span>(<span class="str">"appended line\n"</span>)
+<span class="var">g</span>:<span class="fn">close</span>()</code></pre>
+  <h2>os Library</h2>
+  <pre><code><span class="fn">print</span>(<span class="fn">os.time</span>())                    <span class="cmt">-- unix timestamp</span>
+<span class="fn">print</span>(<span class="fn">os.date</span>(<span class="str">"%Y-%m-%d %H:%M:%S"</span>)) <span class="cmt">-- formatted date</span>
+<span class="fn">print</span>(<span class="fn">os.clock</span>())                   <span class="cmt">-- CPU time used</span>
+<span class="fn">os.execute</span>(<span class="str">"echo hello"</span>)            <span class="cmt">-- run shell command</span>
+<span class="fn">os.exit</span>(<span class="num">0</span>)                          <span class="cmt">-- exit with code</span></code></pre>
+  <h2>math Library</h2>
+  <pre><code><span class="fn">print</span>(<span class="fn">math.floor</span>(<span class="num">3.7</span>))    <span class="cmt">-- 3</span>
+<span class="fn">print</span>(<span class="fn">math.ceil</span>(<span class="num">3.2</span>))     <span class="cmt">-- 4</span>
+<span class="fn">print</span>(<span class="fn">math.abs</span>(<span class="op">-</span><span class="num">5</span>))       <span class="cmt">-- 5</span>
+<span class="fn">print</span>(<span class="fn">math.sqrt</span>(<span class="num">16</span>))      <span class="cmt">-- 4.0</span>
+<span class="fn">print</span>(<span class="fn">math.max</span>(<span class="num">1</span>,<span class="num">5</span>,<span class="num">3</span>))   <span class="cmt">-- 5</span>
+<span class="fn">print</span>(<span class="fn">math.min</span>(<span class="num">1</span>,<span class="num">5</span>,<span class="num">3</span>))   <span class="cmt">-- 1</span>
+<span class="fn">math.randomseed</span>(<span class="fn">os.time</span>())
+<span class="fn">print</span>(<span class="fn">math.random</span>(<span class="num">1</span>, <span class="num">6</span>))  <span class="cmt">-- dice roll</span></code></pre>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(16)">← Back</button>
+    <button class="btn btn-primary" onclick="go(18)">Next →</button>
+  </div>
+</div>
+
+<!-- 18 PATTERNS & PERFORMANCE -->
+<div class="section" id="s18">
+  <div class="sec-badge">Day 2 · Section 18</div>
+  <h1>Patterns & Performance</h1>
+  <h2>Common Lua Patterns</h2>
+  <h3>Pipeline / Method Chaining (using closures)</h3>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">Pipeline</span>(<span class="var">val</span>)
+    <span class="kw">return</span> {
+        map  = <span class="kw">function</span>(<span class="var">self</span>, <span class="var">fn</span>) <span class="kw">return</span> <span class="fn">Pipeline</span>(<span class="fn">fn</span>(<span class="var">self</span>.val)) <span class="kw">end</span>,
+        get  = <span class="kw">function</span>(<span class="var">self</span>) <span class="kw">return</span> <span class="var">self</span>.val <span class="kw">end</span>,
+        val  = <span class="var">val</span>
+    }
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="var">result</span> = <span class="fn">Pipeline</span>(<span class="num">5</span>)
+    :<span class="fn">map</span>(<span class="kw">function</span>(<span class="var">x</span>) <span class="kw">return</span> <span class="var">x</span> <span class="op">*</span> <span class="num">2</span> <span class="kw">end</span>)
+    :<span class="fn">map</span>(<span class="kw">function</span>(<span class="var">x</span>) <span class="kw">return</span> <span class="var">x</span> <span class="op">+</span> <span class="num">1</span> <span class="kw">end</span>)
+    :<span class="fn">get</span>()
+<span class="fn">print</span>(<span class="var">result</span>)   <span class="cmt">-- 11</span></code></pre>
+  <h3>Memoization</h3>
+  <pre><code><span class="kw">local</span> <span class="kw">function</span> <span class="fn">memoize</span>(<span class="var">fn</span>)
+    <span class="kw">local</span> <span class="var">cache</span> = {}
+    <span class="kw">return</span> <span class="kw">function</span>(...)
+        <span class="kw">local</span> <span class="var">key</span> = <span class="builtin">table.concat</span>({...}, <span class="str">","</span>)
+        <span class="kw">if</span> <span class="var">cache</span>[<span class="var">key</span>] <span class="op">==</span> <span class="kw">nil</span> <span class="kw">then</span>
+            <span class="var">cache</span>[<span class="var">key</span>] = <span class="fn">fn</span>(...)
+        <span class="kw">end</span>
+        <span class="kw">return</span> <span class="var">cache</span>[<span class="var">key</span>]
+    <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="fn">fib</span> = <span class="fn">memoize</span>(<span class="kw">function</span>(<span class="var">n</span>)
+    <span class="kw">if</span> <span class="var">n</span> <span class="op"><</span> <span class="num">2</span> <span class="kw">then</span> <span class="kw">return</span> <span class="var">n</span> <span class="kw">end</span>
+    <span class="kw">return</span> <span class="fn">fib</span>(<span class="var">n</span><span class="op">-</span><span class="num">1</span>) <span class="op">+</span> <span class="fn">fib</span>(<span class="var">n</span><span class="op">-</span><span class="num">2</span>)
+<span class="kw">end</span>)
+<span class="fn">print</span>(<span class="fn">fib</span>(<span class="num">40</span>))   <span class="cmt">-- fast!</span></code></pre>
+  <h2>Performance Tips</h2>
+  <table>
+    <tr><th>Rule</th><th>Why</th></tr>
+    <tr><td>Always use <code>local</code></td><td>Local access is ~40% faster than global lookup</td></tr>
+    <tr><td>Cache globals locally</td><td><code>local fmt = string.format</code> in hot loops</td></tr>
+    <tr><td>Preallocate tables</td><td>Avoid repeated resizing: <code>local t = table.new(n,0)</code> (LuaJIT)</td></tr>
+    <tr><td>Build strings with table.concat</td><td>Concatenating in a loop is O(n²); concat is O(n)</td></tr>
+    <tr><td>Avoid closures in hot paths</td><td>Closure creation has overhead</td></tr>
+    <tr><td>Reuse tables when possible</td><td>Reduces GC pressure</td></tr>
+  </table>
+  <h2>String Building (correct way)</h2>
+  <pre><code><span class="cmt">-- SLOW: O(n²)</span>
+<span class="kw">local</span> <span class="var">s</span> = <span class="str">""</span>
+<span class="kw">for</span> <span class="var">i</span> = <span class="num">1</span>, <span class="num">10000</span> <span class="kw">do</span> <span class="var">s</span> = <span class="var">s</span> <span class="op">..</span> <span class="var">i</span> <span class="kw">end</span>
+
+<span class="cmt">-- FAST: O(n)</span>
+<span class="kw">local</span> <span class="var">parts</span> = {}
+<span class="kw">for</span> <span class="var">i</span> = <span class="num">1</span>, <span class="num">10000</span> <span class="kw">do</span> <span class="var">parts</span>[<span class="var">i</span>] = <span class="fn">tostring</span>(<span class="var">i</span>) <span class="kw">end</span>
+<span class="kw">local</span> <span class="var">s</span> = <span class="builtin">table.concat</span>(<span class="var">parts</span>)</code></pre>
+  <div class="tip">LuaJIT is a Just-In-Time compiler for Lua 5.1 that is often 10–100x faster than stock Lua. If performance is critical, use LuaJIT or consider the C API.</div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(17)">← Back</button>
+    <button class="btn btn-primary" onclick="go(19)">Next →</button>
+  </div>
+</div>
+
+<!-- 19 FINAL PROJECT & NEXT STEPS -->
+<div class="section" id="s19">
+  <div class="sec-badge">Day 2 · Final Project</div>
+  <h1>Final Project — Task Manager</h1>
+  <p>A complete CLI task manager using everything from both days: OOP, modules, file I/O, error handling, patterns.</p>
+  <pre><code><span class="cmt">-- tasks.lua  (save and run: lua tasks.lua)</span>
+
+<span class="kw">local</span> <span class="var">FILENAME</span> = <span class="str">"tasks.db"</span>
+
+<span class="cmt">-- Task class</span>
+<span class="kw">local</span> <span class="var">Task</span> = {}
+<span class="var">Task</span>.__index = <span class="var">Task</span>
+
+<span class="kw">function</span> <span class="var">Task</span>.<span class="fn">new</span>(<span class="var">id</span>, <span class="var">title</span>, <span class="var">done</span>)
+    <span class="kw">return</span> <span class="fn">setmetatable</span>({
+        id    = <span class="var">id</span>,
+        title = <span class="var">title</span>,
+        done  = <span class="var">done</span> <span class="kw">or</span> <span class="kw">false</span>,
+    }, <span class="var">Task</span>)
+<span class="kw">end</span>
+
+<span class="kw">function</span> <span class="var">Task</span>:<span class="fn">__tostring</span>()
+    <span class="kw">local</span> <span class="var">mark</span> = <span class="var">self</span>.done <span class="kw">and</span> <span class="str">"[x]"</span> <span class="kw">or</span> <span class="str">"[ ]"</span>
+    <span class="kw">return</span> <span class="builtin">string.format</span>(<span class="str">"%s #%d %s"</span>, <span class="var">mark</span>, <span class="var">self</span>.id, <span class="var">self</span>.title)
+<span class="kw">end</span>
+
+<span class="cmt">-- Persistence (simple CSV-like format)</span>
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">load</span>()
+    <span class="kw">local</span> <span class="var">tasks</span>, <span class="var">nextId</span> = {}, <span class="num">1</span>
+    <span class="kw">local</span> <span class="var">f</span> = <span class="fn">io.open</span>(<span class="var">FILENAME</span>, <span class="str">"r"</span>)
+    <span class="kw">if</span> <span class="var">f</span> <span class="kw">then</span>
+        <span class="kw">for</span> <span class="var">line</span> <span class="kw">in</span> <span class="var">f</span>:<span class="fn">lines</span>() <span class="kw">do</span>
+            <span class="kw">local</span> <span class="var">id</span>, <span class="var">done</span>, <span class="var">title</span> = <span class="var">line</span>:<span class="fn">match</span>(<span class="str">"^(%d+)|([01])|(.+)$"</span>)
+            <span class="kw">if</span> <span class="var">id</span> <span class="kw">then</span>
+                <span class="var">id</span> = <span class="fn">tonumber</span>(<span class="var">id</span>)
+                <span class="var">tasks</span>[<span class="op">#</span><span class="var">tasks</span><span class="op">+</span><span class="num">1</span>] = <span class="var">Task</span>.<span class="fn">new</span>(<span class="var">id</span>, <span class="var">title</span>, <span class="var">done</span><span class="op">==</span><span class="str">"1"</span>)
+                <span class="kw">if</span> <span class="var">id</span> <span class="op">>=</span> <span class="var">nextId</span> <span class="kw">then</span> <span class="var">nextId</span> = <span class="var">id</span><span class="op">+</span><span class="num">1</span> <span class="kw">end</span>
+            <span class="kw">end</span>
+        <span class="kw">end</span>
+        <span class="var">f</span>:<span class="fn">close</span>()
+    <span class="kw">end</span>
+    <span class="kw">return</span> <span class="var">tasks</span>, <span class="var">nextId</span>
+<span class="kw">end</span>
+
+<span class="kw">local</span> <span class="kw">function</span> <span class="fn">save</span>(<span class="var">tasks</span>)
+    <span class="kw">local</span> <span class="var">f</span> = <span class="fn">io.open</span>(<span class="var">FILENAME</span>, <span class="str">"w"</span>)
+    <span class="kw">for</span> <span class="var">_</span>, <span class="var">t</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">tasks</span>) <span class="kw">do</span>
+        <span class="var">f</span>:<span class="fn">write</span>(<span class="builtin">string.format</span>(<span class="str">"%d|%d|%s\n"</span>, <span class="var">t</span>.id, <span class="var">t</span>.done <span class="kw">and</span> <span class="num">1</span> <span class="kw">or</span> <span class="num">0</span>, <span class="var">t</span>.title))
+    <span class="kw">end</span>
+    <span class="var">f</span>:<span class="fn">close</span>()
+<span class="kw">end</span>
+
+<span class="cmt">-- Commands</span>
+<span class="kw">local</span> <span class="var">tasks</span>, <span class="var">nextId</span> = <span class="fn">load</span>()
+
+<span class="kw">local</span> <span class="var">cmds</span> = {
+    list = <span class="kw">function</span>()
+        <span class="kw">if</span> <span class="op">#</span><span class="var">tasks</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span> <span class="fn">print</span>(<span class="str">"No tasks."</span>) <span class="kw">return</span> <span class="kw">end</span>
+        <span class="kw">for</span> <span class="var">_</span>, <span class="var">t</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">tasks</span>) <span class="kw">do</span> <span class="fn">print</span>(<span class="fn">tostring</span>(<span class="var">t</span>)) <span class="kw">end</span>
+    <span class="kw">end</span>,
+
+    add = <span class="kw">function</span>(<span class="var">title</span>)
+        <span class="fn">assert</span>(<span class="var">title</span> <span class="kw">and</span> <span class="op">#</span><span class="var">title</span> <span class="op">></span> <span class="num">0</span>, <span class="str">"Usage: add <title>"</span>)
+        <span class="var">tasks</span>[<span class="op">#</span><span class="var">tasks</span><span class="op">+</span><span class="num">1</span>] = <span class="var">Task</span>.<span class="fn">new</span>(<span class="var">nextId</span>, <span class="var">title</span>)
+        <span class="var">nextId</span> = <span class="var">nextId</span> <span class="op">+</span> <span class="num">1</span>
+        <span class="fn">save</span>(<span class="var">tasks</span>)
+        <span class="fn">print</span>(<span class="str">"Added: "</span> <span class="op">..</span> <span class="var">title</span>)
+    <span class="kw">end</span>,
+
+    done = <span class="kw">function</span>(<span class="var">idStr</span>)
+        <span class="kw">local</span> <span class="var">id</span> = <span class="fn">tonumber</span>(<span class="var">idStr</span>)
+        <span class="fn">assert</span>(<span class="var">id</span>, <span class="str">"Usage: done <id>"</span>)
+        <span class="kw">for</span> <span class="var">_</span>, <span class="var">t</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">tasks</span>) <span class="kw">do</span>
+            <span class="kw">if</span> <span class="var">t</span>.id <span class="op">==</span> <span class="var">id</span> <span class="kw">then</span>
+                <span class="var">t</span>.done = <span class="kw">true</span>; <span class="fn">save</span>(<span class="var">tasks</span>); <span class="fn">print</span>(<span class="str">"Done: "</span> <span class="op">..</span> <span class="var">t</span>.title); <span class="kw">return</span>
+            <span class="kw">end</span>
+        <span class="kw">end</span>
+        <span class="fn">print</span>(<span class="str">"Task not found: "</span> <span class="op">..</span> <span class="var">id</span>)
+    <span class="kw">end</span>,
+
+    remove = <span class="kw">function</span>(<span class="var">idStr</span>)
+        <span class="kw">local</span> <span class="var">id</span> = <span class="fn">tonumber</span>(<span class="var">idStr</span>)
+        <span class="fn">assert</span>(<span class="var">id</span>, <span class="str">"Usage: remove <id>"</span>)
+        <span class="kw">for</span> <span class="var">i</span>, <span class="var">t</span> <span class="kw">in</span> <span class="fn">ipairs</span>(<span class="var">tasks</span>) <span class="kw">do</span>
+            <span class="kw">if</span> <span class="var">t</span>.id <span class="op">==</span> <span class="var">id</span> <span class="kw">then</span>
+                <span class="builtin">table.remove</span>(<span class="var">tasks</span>, <span class="var">i</span>); <span class="fn">save</span>(<span class="var">tasks</span>)
+                <span class="fn">print</span>(<span class="str">"Removed #"</span> <span class="op">..</span> <span class="var">id</span>); <span class="kw">return</span>
+            <span class="kw">end</span>
+        <span class="kw">end</span>
+    <span class="kw">end</span>,
+}
+
+<span class="cmt">-- Main loop</span>
+<span class="fn">print</span>(<span class="str">"Task Manager — commands: list, add <t>, done <id>, remove <id>, quit"</span>)
+<span class="kw">while</span> <span class="kw">true</span> <span class="kw">do</span>
+    <span class="fn">io.write</span>(<span class="str">"tasks> "</span>)
+    <span class="kw">local</span> <span class="var">line</span> = <span class="fn">io.read</span>()
+    <span class="kw">if</span> <span class="kw">not</span> <span class="var">line</span> <span class="kw">or</span> <span class="var">line</span> <span class="op">==</span> <span class="str">"quit"</span> <span class="kw">then</span> <span class="kw">break</span> <span class="kw">end</span>
+    <span class="kw">local</span> <span class="var">cmd</span>, <span class="var">arg</span> = <span class="var">line</span>:<span class="fn">match</span>(<span class="str">"^(%S+)%s*(.*)"</span>)
+    <span class="kw">if</span> <span class="var">cmds</span>[<span class="var">cmd</span>] <span class="kw">then</span>
+        <span class="kw">local</span> <span class="var">ok</span>, <span class="var">err</span> = <span class="fn">pcall</span>(<span class="var">cmds</span>[<span class="var">cmd</span>], <span class="var">arg</span> <span class="op">~=</span> <span class="str">""</span> <span class="kw">and</span> <span class="var">arg</span> <span class="kw">or</span> <span class="kw">nil</span>)
+        <span class="kw">if</span> <span class="kw">not</span> <span class="var">ok</span> <span class="kw">then</span> <span class="fn">print</span>(<span class="str">"Error: "</span> <span class="op">..</span> <span class="var">err</span>) <span class="kw">end</span>
+    <span class="kw">else</span>
+        <span class="fn">print</span>(<span class="str">"Unknown command"</span>)
+    <span class="kw">end</span>
+<span class="kw">end</span></code></pre>
+
+  <h2>Where to Go Next</h2>
+  <table>
+    <tr><th>Topic</th><th>Resource</th></tr>
+    <tr><td>Official Reference</td><td>lua.org/manual/5.4</td></tr>
+    <tr><td>Game dev</td><td>LÖVE2D (love2d.org)</td></tr>
+    <tr><td>Roblox scripting</td><td>create.roblox.com/docs</td></tr>
+    <tr><td>Neovim config</td><td>neovim.io/doc/user/lua.html</td></tr>
+    <tr><td>Web / Nginx</td><td>OpenResty (openresty.org)</td></tr>
+    <tr><td>Performance</td><td>LuaJIT (luajit.org)</td></tr>
+    <tr><td>Package manager</td><td>LuaRocks (luarocks.org)</td></tr>
+    <tr><td>Testing</td><td>busted (olivinelabs.com/busted)</td></tr>
+  </table>
+
+  <div class="tip">You now know everything from basics to professional Lua. The key next step: <strong>build something real</strong>. Pick a project in a domain you care about — a game, a plugin, a CLI tool — and write it in Lua.</div>
+  <div class="nav-btns">
+    <button class="btn btn-secondary" onclick="go(18)">← Back</button>
+    <button class="btn btn-primary" onclick="go(0)">↑ Back to Start</button>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+  const TOTAL = 20;
+  let visited = new Set([0]);
+
+  function go(idx) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById('s' + idx).classList.add('active');
+
+    document.querySelectorAll('.nav-link').forEach((a, i) => {
+      a.classList.toggle('active', i === idx);
+    });
+
+    visited.add(idx);
+    updateProgress();
+    window.scrollTo(0, 0);
+    return false;
+  }
+
+  function updateProgress() {
+    const pct = Math.round((visited.size / TOTAL) * 100);
+    document.getElementById('pbar').style.width = pct + '%';
+    document.getElementById('progress-label').textContent = visited.size + ' / ' + TOTAL;
+
+    document.querySelectorAll('.nav-link').forEach((a, i) => {
+      if (visited.has(i) && !a.classList.contains('active')) {
+        a.classList.add('done');
+      }
+    });
+  }
+
+  function check(name, correct, btn) {
+    const selected = document.querySelector(`input[name="${name}"]:checked`);
+    const res = document.getElementById(name + '-res');
+    if (!selected) { res.style.display = 'block'; res.className = 'quiz-result wrong'; res.textContent = 'Please select an answer.'; return; }
+    res.style.display = 'block';
+    if (selected.value === correct) {
+      res.className = 'quiz-result correct';
+      res.textContent = '✓ Correct!';
+      btn.disabled = true;
+    } else {
+      res.className = 'quiz-result wrong';
+      res.textContent = '✗ Not quite — try again.';
+    }
+  }
+
+  // Init
+  updateProgress();
+</script>
+</body>
+</html>
